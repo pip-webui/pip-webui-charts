@@ -42,3 +42,6 @@
     opacity: 0.38;
   }
 }
+.tick.zero text {
+  font: 12px 'Roboto';
+}
