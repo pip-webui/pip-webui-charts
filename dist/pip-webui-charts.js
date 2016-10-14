@@ -9,7 +9,7 @@
     'use strict';
 
     angular.module('pipCharts', [
-//        'pipMarkdown'
+
     ]);
 
 })(window.angular);
