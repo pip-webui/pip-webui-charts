@@ -2,7 +2,7 @@
     "name": "pip-webui-charts",
     "version": "1.5.0",
     "author": "Digital Living Software Corp. <www.digitallivingsoftware.com>",
-    "description": "Basic controls for Pip.WebUI",
+    "description": "Chart controls for Pip.WebUI",
     "contributors": [
         {
             "name": "Sergey Seroukhov",
