@@ -1,41 +1,3 @@
-/**
- * @file Registration of chart WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipCharts', [
-        'pipStaticCharts'
-    ]);
-
-})(window.angular);
-
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart flex-auto layout-column">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<div class="static-chart-legend">\n' +
-    '    <div class="legend-title" ng-repeat="item in barChart.legend">\n' +
-    '        <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '        <span>{{:: item.label}}</span>\n' +
-    '    </div>\n' +
-    '</div>');
-}]);
-})();
-
 (function () {
     'use strict';
 
@@ -58,7 +20,7 @@ module.run(['$templateCache', function($templateCache) {
             bindToController: true,
             controllerAs: 'barChart',
             templateUrl: 'bar/bar_chart.html',
-            controller: ['$element', '$scope', '$timeout', '$interval', '$mdColorPalette', function ($element, $scope, $timeout, $interval, $mdColorPalette) {
+            controller: function ($element, $scope, $timeout, $interval, $mdColorPalette) {
                 var vm = this;
                 var chart = null;
                 var chartElem = null;
@@ -196,8 +158,7 @@ module.run(['$templateCache', function($templateCache) {
                         item.color = materialColorToRgba(colors[index]);
                     });
                 }
-            }]
+            }
         };
     }
 })();
-//# sourceMappingURL=pip-webui-charts.js.map
