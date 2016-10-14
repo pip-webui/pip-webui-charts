@@ -36,8 +36,7 @@
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-
-                // TODO [apidhirnyi] Ask Alex about colors for charts
+                
                 //colors = _.sample(colors, colors.length);
 
                 // Sets colors of items
