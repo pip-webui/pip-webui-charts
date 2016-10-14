@@ -36,14 +36,16 @@
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                
+
                 //colors = _.sample(colors, colors.length);
 
                 // Sets colors of items
                 generateParameterColor();
 
+                console.log('vm.data', vm.data);
+
                 // sets legend params
-                vm.legend = vm.data[0].values;
+                vm.legend = vm.data;
 
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -57,7 +59,7 @@
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         chart.update();
-                        intervalUpdate(chart.update, 10); // TODO [apidhirnyi] Temp dirty hack
+                        intervalUpdate(chart.update, 10);
                     }
                 });
 
@@ -66,22 +68,20 @@
                  * Instantiate chart
                  */
                 nv.addGraph(function () {
+                    console.log('here');
+
                     chart = nv.models.discreteBarChart()
-                        .margin({top: 10, right: 0, bottom: 10, left: 0})
-                        .x(function (d) {
-                            return d.label;
-                        })
-                        .y(function (d) {
-                            return d.value;
-                        })
+                        .margin({top: 10, right: 0, bottom: 30, left: 0})
+                        .x(function (d) { return d.label; })
+                        .y(function (d) { return d.value; })
                         .showValues(true)
-                        .showXAxis(false)
+                        .showXAxis(true)
                         .showYAxis(false)
                         .valueFormat(d3.format('d'))
                         .color(d3.scale.paletteColors().range());
 
                     chart.tooltip.enabled(false);
-                    chart.noData('There are no readings for this moment...');
+                    chart.noData('No data for this moment...');
 
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
@@ -152,7 +152,6 @@
                  * @private
                  */
                 function generateParameterColor() {
-                    console.log('colors', colors);
                     vm.data.forEach(function (item, index) {
                         item.color = materialColorToRgba(colors[index]);
                     });
