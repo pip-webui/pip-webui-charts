@@ -1,20 +1,3 @@
-/**
- * @file Registration of chart WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipCharts', [
-        'pipStaticCharts'
-    ]);
-
-})(window.angular);
-
-
 (function(module) {
 try {
   module = angular.module('pipCharts.Templates');
@@ -35,6 +18,23 @@ module.run(['$templateCache', function($templateCache) {
     '</div>');
 }]);
 })();
+
+/**
+ * @file Registration of chart WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipCharts', [
+        'pipStaticCharts'
+    ]);
+
+})(window.angular);
+
 
 (function () {
     'use strict';
