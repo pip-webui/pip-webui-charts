@@ -10,7 +10,7 @@
 
 
     var thisModule = angular.module('app', ['ngMaterial',
-        'pipCore', 'pipCharts', 'pipCharts.Templates',
+        'pipServices', 'pipCharts', 'pipCharts.Templates',
         'appLineChart', 'appBarChart']);
 
     thisModule.config(function ($stateProvider, $urlRouterProvider, $mdThemingProvider, $mdIconProvider) {
