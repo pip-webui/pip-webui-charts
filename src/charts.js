@@ -10,7 +10,8 @@
 
     angular.module('pipCharts', [
         'pipBarCharts',
-        'pipLineCharts'
+        'pipLineCharts',
+        'pipPieCharts'
     ]);
 
 })(window.angular);

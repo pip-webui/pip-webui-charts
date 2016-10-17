@@ -1,0 +1,10 @@
+<div class="pie-chart" flex="auto" layout="column">
+    <svg class="flex-auto"></svg>
+</div>
+
+<div class="static-chart-legend">
+    <div class="legend-title" ng-repeat="item in pieChart.data">
+        <span class="bullet" ng-style="{'background-color': item.color}"></span>
+        <span>{{:: item.label}}</span>
+    </div>
+</div>
