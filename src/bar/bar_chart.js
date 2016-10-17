@@ -24,12 +24,9 @@
                 var vm = this;
                 var chart = null;
                 var chartElem = null;
-                var setLabelPosition = _.debounce(setLabelPositionUnwrap, 150);
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
-
-                console.log('colors', colors);
 
                 vm.data = vm.series || [];
 
@@ -39,13 +36,11 @@
 
                 //colors = _.sample(colors, colors.length);
 
+                // sets legend params
+                vm.legend = vm.data[0].values;
+                
                 // Sets colors of items
                 generateParameterColor();
-
-                console.log('vm.data', vm.data);
-
-                // sets legend params
-                vm.legend = vm.data;
 
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -68,17 +63,19 @@
                  * Instantiate chart
                  */
                 nv.addGraph(function () {
-                    console.log('here');
-
                     chart = nv.models.discreteBarChart()
-                        .margin({top: 10, right: 0, bottom: 30, left: 0})
+                        .margin({top: 10, right: 0, bottom: 0, left: -50})
                         .x(function (d) { return d.label; })
                         .y(function (d) { return d.value; })
                         .showValues(true)
-                        .showXAxis(true)
+                        .showXAxis(false)
                         .showYAxis(false)
                         .valueFormat(d3.format('d'))
-                        .color(d3.scale.paletteColors().range());
+                        .duration(0)
+                        .height(270)
+                        .color(function(d) {
+                            return d.color || d3.scale.paletteColors().range();
+                        });
 
                     chart.tooltip.enabled(false);
                     chart.noData('No data for this moment...');
@@ -86,33 +83,54 @@
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
                         .datum(vm.data)
+                        .style('height', 270)
                         .call(chart);
 
-                    nv.utils.windowResize(chart.update);
-
-                    intervalUpdate(chart.update, 10);
+                    //nv.utils.windowResize(chart.update);
 
                     return chart;
                 }, function () {
                     chart.dispatch.on('beforeUpdate', function () {
-                        $timeout(setLabelPosition, 100);    // dirty hack. Replace by callback
+                        $timeout(configBarWidthAndLabel, 0);
                     });
 
-                    $timeout(setLabelPosition, 100);        // dirty hack. Replace by callback
+                    $timeout(configBarWidthAndLabel, 0);
                 });
 
                 /**
                  * Aligns value label according to parent container size.
                  * @return {void}
                  */
-                function setLabelPositionUnwrap() {
-                    var labels = d3.selectAll('.nv-bar text')[0];
-                    var chartBars = d3.selectAll('.nv-bar')[0];
+                function configBarWidthAndLabel() {
+                    var labels = d3.selectAll('.nv-bar text')[0],
+                        chartBars = d3.selectAll('.nv-bar')[0],
+                        legendTitles = d3.selectAll('.legend-title')[0],
+                        parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
 
                     chartBars.forEach(function (item, index) {
-                        var barSize = item.getBBox();
+                        var barSize = item.getBBox(),
+                            element = d3.select(item),
+                            y = d3.transform(element.attr('transform')).translate[1];
+                        
+                        element
+                            .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
+                            .select('rect')
+                            .attr('width', 38);
 
-                        d3.select(labels[index]).attr('dy', barSize.height / 2 + 6);   // 6px = magic float to align text
+                        element
+                            .transition()
+                            .duration(1000)
+                            .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + y + ')');
+
+                        d3.select(labels[index])
+                            .attr('dy', barSize.height / 2)
+                            .attr('x', 19);
+                    });
+
+                    legendTitles.forEach(function (item, index) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
                     });
                 }
 
@@ -131,29 +149,12 @@
                 }
 
                 /**
-                 * Temp huck for demo
-                 * Dirty way to overcome async in charts
-                 */
-                function intervalUpdate(cb, times) {
-                    var counter = 0;
-
-                    var intervalID = $interval(function () {
-                        if (counter <= times) {
-                            cb();
-                            counter++;
-                        } else {
-                            $interval.cancel(intervalID);
-                        }
-                    }, 200);
-                }
-
-                /**
                  * Helpful method
                  * @private
                  */
                 function generateParameterColor() {
-                    vm.data.forEach(function (item, index) {
-                        item.color = materialColorToRgba(colors[index]);
+                    vm.legend.forEach(function (item, index) {
+                        item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
             }

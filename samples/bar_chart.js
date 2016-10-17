@@ -15,8 +15,9 @@
             $scope.series = [{
                 key: 'Some key',
                 values: [
-                    {value: 25, label: 'Completed'},
-                    {value: 10, label: 'Uncompleted'}
+                    {value: 980, label: 'Completed', color: '#4caf50'},
+                    {value: 710, label: 'Uncompleted', color: '#fe9702'},
+                    {value: 250, label: 'Failures', color: '#ef5350'}
                 ]
             }];
         }
