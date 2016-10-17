@@ -5,7 +5,7 @@ module.exports = {
     },
     build: {
         js: true,
-        ts: true,
+        ts: false,
         html: true,
         css: true,
         lib: true,
@@ -15,8 +15,8 @@ module.exports = {
     file: {
         lib: [
             '../pip-webui-lib/dist/**/*',
-            '../pip-webui-cssframework/dist/**/*',
-            '../pip-webui-core/dist/**/*',
+            '../pip-webui-css/dist/**/*',
+            '../pip-webui-services/dist/**/*',
              '../pip-webui-controls/dist/**/*',
              '../pip-webui-nav/dist/**/*',
              '../pip-webui-layouts/dist/**/*',

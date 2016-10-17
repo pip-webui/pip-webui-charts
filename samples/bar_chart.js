@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    var thisModule = angular.module('appBarChart', ['pipCore']);
+    var thisModule = angular.module('appBarChart', ['pipServices']);
 
     thisModule.controller('BarChartController',
         function ($scope) {

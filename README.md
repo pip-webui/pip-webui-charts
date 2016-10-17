@@ -21,8 +21,8 @@ Todo: add descriptions of charts and links to samples
 ## <a name="dependencies"></a>Module dependencies
 
 * [pip-webui-lib](https://github.com/pip-webui/pip-webui-lib): angular, angular material and other 3rd party libraries
-* [pip-webui-cssframework](https://github.com/pip-webui/pip-webui-cssframework): CSS framework
-* [pip-webui-core](https://github.com/pip-webui/pip-webui-core): localization and other core services
+* [pip-webui-css](https://github.com/pip-webui/pip-webui-css): CSS framework
+* [pip-webui-services](https://github.com/pip-webui/pip-webui-services): localization and other core services
 
 ## <a name="license"></a>License
 
