@@ -9,7 +9,8 @@
     'use strict';
 
     angular.module('pipCharts', [
-        'pipStaticCharts'
+        'pipBarCharts',
+        'pipLineCharts'
     ]);
 
 })(window.angular);

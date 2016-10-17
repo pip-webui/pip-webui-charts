@@ -7,11 +7,6 @@
 
     thisModule.controller('BarChartController',
         function ($scope) {
-            //$scope.series = [
-            //    {values: 25, label: 'Completed'},
-            //    {values: 10, label: 'Uncompleted'}
-            //];
-
             $scope.series = [{
                 key: 'Some key',
                 values: [

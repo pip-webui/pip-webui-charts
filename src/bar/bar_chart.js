@@ -3,12 +3,12 @@
 
     /**
      * @ngdoc module
-     * @name pipStaticCharts
+     * @name pipBarCharts
      *
      * @description
      * Bar chart on top of Rickshaw charts
      */
-    angular.module('pipStaticCharts', [])
+    angular.module('pipBarCharts', [])
         .directive('pipBarChart', pipBarChart);
 
     function pipBarChart() {
@@ -106,6 +106,8 @@
                         chartBars = d3.selectAll('.nv-bar')[0],
                         legendTitles = d3.selectAll('.legend-title')[0],
                         parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
+
+                    d3.select('.bar-chart').classed('visible', true);
 
                     chartBars.forEach(function (item, index) {
                         var barSize = item.getBBox(),
