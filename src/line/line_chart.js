@@ -66,7 +66,7 @@
                             return d.value;
                         })
                         .height(270)
-                        .interactive(true)
+                        .interactive(false)
                         .showXAxis(true)
                         .showYAxis(true)
                         .showLegend(false)
@@ -79,12 +79,12 @@
 
                     chart.yAxis
                         .tickFormat(function (d) {
-                            return Math.round(d % 1 * 100);
+                            return d / 1000 + 'k';
                         });
 
                     chart.xAxis
                         .tickFormat(function (d) {
-                            return Math.round(d);
+                            return d;
                         });
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
