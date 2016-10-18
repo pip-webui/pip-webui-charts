@@ -11,7 +11,8 @@
     angular.module('pipCharts', [
         'pipBarCharts',
         'pipLineCharts',
-        'pipPieCharts'
+        'pipPieCharts',
+        'pipChartLegends'
     ]);
 
 })(window.angular);

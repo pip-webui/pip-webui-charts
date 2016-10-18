@@ -1,0 +1,21 @@
+<div >
+    <div class="chart-legend-item" ng-repeat="item in series">
+        <md-checkbox class="lp16 m8"
+                     ng-model="item.disabled"
+                     ng-true-value="false"
+                     ng-false-value="true"
+                     ng-if="interactive"
+                     aria-label="{{ item.label }}">
+            <p class="legend-item-value"
+               ng-style="{'background-color': item.color}">
+                {{ item.value }}
+            </p>
+            <p class="legend-item-label">{{ item.label }}</p>
+        </md-checkbox>
+
+        <div ng-if="!interactive">
+            <span class="bullet" ng-style="{'background-color': item.color}"></span>
+            <span>{{:: item.label}}</span>
+        </div>
+    </div>
+</div>

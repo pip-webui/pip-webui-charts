@@ -66,7 +66,7 @@
                             return d.value;
                         })
                         .height(270)
-                        .interactive(false)
+                        .useInteractiveGuideline(true)
                         .showXAxis(true)
                         .showYAxis(true)
                         .showLegend(false)
@@ -101,6 +101,12 @@
                             $(item).addClass('visible');
                         }, 200 * index);
                     });
+
+                    d3.select('.nv-groups')
+                        .on('mouseenter', function () {
+                            console.log('1', d3.select(d3.select('.nv-interactiveGuideLine')[0][0]));
+                            console.log('2', d3.select('.nv-interactiveGuideLine')[0][0]);
+                        })
                 });
 
                 /**
