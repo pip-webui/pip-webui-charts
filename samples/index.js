@@ -5,13 +5,14 @@
 
     var content = [
         { title: 'Bar chart', state: 'bar', url: '/bar', controller: 'BarChartController', templateUrl: 'bar_chart.html' },
-        { title: 'Line chart', state: 'line', url: '/line', controller: 'LineChartController', templateUrl: 'line_chart.html'}
+        { title: 'Line chart', state: 'line', url: '/line', controller: 'LineChartController', templateUrl: 'line_chart.html'},
+        { title: 'Pie chart', state: 'pie', url: '/pie', controller: 'PieChartController', templateUrl: 'pie_chart.html'}
     ];
 
 
     var thisModule = angular.module('app', ['ngMaterial',
         'pipServices', 'pipCharts', 'pipCharts.Templates',
-        'appLineChart', 'appBarChart']);
+        'appLineChart', 'appBarChart', 'appPieChart']);
 
     thisModule.config(function ($stateProvider, $urlRouterProvider, $mdThemingProvider, $mdIconProvider) {
 

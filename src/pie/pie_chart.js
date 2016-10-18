@@ -66,18 +66,25 @@
                         .y(function (d) {
                             return d.value;
                         })
+                        .height(250)
+                        .width(250)
                         .showLabels(true)
+                        .labelThreshold(.001)
                         .growOnHover(false)
                         .donut(true)
-                        .donutRatio(0.55)
-                        .color(d3.scale.paletteColors().range());
+                        .donutRatio(0.5)
+                        .color(function(d) {
+                            return d.color || d3.scale.paletteColors().range();
+                        });
 
                     chart.tooltip.enabled(false);
-                    chart.noData('There are no readings for this moment...');
+                    chart.noData('No data for this moment...');
                     chart.showLegend(false);
 
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
+                        .attr('height', 250)
+                        .style('opacity', 0)
                         .datum(vm.data)
                         .call(chart);
 
@@ -88,10 +95,11 @@
 
                     return chart;
                 }, function () {
-                    $timeout(_.debounce(renderTotalLabel, 250));
+                    $timeout(renderTotalLabel);
                 });
 
                 function renderTotalLabel() {
+                    var legendTitles = d3.selectAll('.legend-title')[0];
                     var svgElem  = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
@@ -104,9 +112,20 @@
                         .attr('text-anchor', 'middle')
                         .style('dominant-baseline', 'central')
                         .text(totalVal);
+                    
+                    d3.select(svgElem)
+                        .transition()
+                        .duration(1000)
+                        .style('opacity', 1);
 
                     titleElem = d3.select($element.find('text.label-total').get(0));
                     resizeTitleLabel();
+
+                    legendTitles.forEach(function (item, index) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
                 }
 
                 function resizeTitleLabelUnwrap() {
@@ -140,7 +159,7 @@
                  */
                 function generateParameterColor() {
                     vm.data.forEach(function (item, index) {
-                        item.color = materialColorToRgba(colors[index]);
+                        item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
             }
