@@ -52,6 +52,7 @@
 
                 $scope.series.forEach(function (item, index) {
                     item.color = item.color || colors[index];
+                    item.disabled = item.disabled || false;
                 });
 
                 $scope.$watch('interactive', function (newValue, oldValue) {
