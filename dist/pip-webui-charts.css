@@ -44,6 +44,7 @@
 }
 pip-bar-chart .bar-chart {
   opacity: 0;
+  margin-bottom: 20px;
 }
 pip-bar-chart .bar-chart.visible {
   opacity: 1;
@@ -65,27 +66,94 @@ pip-bar-chart .nvd3 .nv-discretebar .nv-groups text {
   font-weight: 500;
   fill: #ffffff;
 }
-.pip-chart-legend {
-  margin-top: 17px;
+pip-line-chart .nvd3 .nv-axis line {
+  stroke-dasharray: 3, 3;
+  stroke: rgba(0, 0, 0, 0.12);
 }
-.pip-chart-legend .legend-title {
+pip-line-chart .nvd3 .nv-axis .tick.zero {
+  opacity: 0 !important;
+}
+pip-line-chart .nvd3 .nv-axis path {
+  stroke: rgba(0, 0, 0, 0.26);
+}
+pip-line-chart .nvd3 .nv-axis text {
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: 500 !important;
+  fill: rgba(0, 0, 0, 0.54);
+}
+pip-line-chart .nvd3 .nv-x .tick:not(.zero) line {
+  opacity: 0;
+}
+pip-line-chart .nvd3 .nv-y .tick:not(.zero) line {
+  opacity: 0;
+}
+pip-line-chart .visible-x-axis .nvd3 .nv-x .tick:not(.zero) line {
+  opacity: 1;
+}
+pip-line-chart .visible-y-axis .nvd3 .nv-y .tick:not(.zero) line {
+  opacity: 1;
+}
+pip-pie-chart .nvd3.nv-pie path {
+  fill-opacity: 1 !important;
+}
+pip-pie-chart .nvd3.nv-pie .label-total {
+  font-family: Roboto;
+  font-size: 48px !important;
+  font-weight: 500;
+  font-style: normal;
+  font-stretch: normal;
+  text-align: center;
+}
+pip-pie-chart .nvd3.nv-pie .nv-pieLabels .nv-label text {
+  font-family: Roboto;
+  font-size: 14px;
+  font-weight: bold;
+  font-style: normal;
+  font-stretch: normal;
+  text-align: center;
+  fill: #ffffff !important;
+}
+pip-chart-legend .chart-legend-item {
   display: inline-block;
-  margin-right: 10px;
+  margin-right: 20px;
   opacity: 0;
   margin-left: -50px;
   transition: all 0.5s ease;
   font-size: 12px;
-  font-family: 'Roboto Medium';
+  font-family: 'Roboto';
   font-weight: 500;
   color: rgba(0, 0, 0, 0.54);
 }
-.pip-chart-legend .legend-title .bullet {
+pip-chart-legend .chart-legend-item .bullet {
   width: 12px;
   height: 12px;
   border-radius: 6px;
   display: inline-block;
 }
-.pip-chart-legend .legend-title.visible {
+pip-chart-legend .chart-legend-item md-checkbox:not(.md-checked) .md-icon {
+  background-color: transparent !important;
+}
+pip-chart-legend .chart-legend-item .legend-item-value,
+pip-chart-legend .chart-legend-item .legend-item-label {
+  display: inline-block;
+}
+pip-chart-legend .chart-legend-item .legend-item-value {
+  padding: 1px 0px 2px 0px;
+  border-radius: 2px;
+  color: #ffffff;
+  transition: all .2s;
+  max-width: 0px;
+  opacity: 0;
+}
+pip-chart-legend .chart-legend-item md-checkbox.md-checked .legend-item-value {
+  max-width: 300px;
+  padding-left: 8px;
+  padding-right: 8px;
+  opacity: 1;
+  margin-right: 8px;
+}
+pip-chart-legend .chart-legend-item.visible {
   opacity: 1;
   margin-left: 0px;
 }

@@ -1,21 +1,3 @@
-/**
- * @file Registration of chart WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-
-/* global angular */
-
-(function (angular) {
-    'use strict';
-
-    angular.module('pipCharts', [
-        'pipBarCharts',
-        'pipLineCharts'
-    ]);
-
-})(window.angular);
-
-
 (function(module) {
 try {
   module = angular.module('pipCharts.Templates');
@@ -28,10 +10,37 @@ module.run(['$templateCache', function($templateCache) {
     '    <svg class="flex-auto"></svg>\n' +
     '</div>\n' +
     '\n' +
-    '<div class="pip-chart-legend">\n' +
-    '    <div class="legend-title" ng-repeat="item in barChart.legend">\n' +
-    '        <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '        <span>{{:: item.label}}</span>\n' +
+    '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('legend/interactive_legend.html',
+    '<div >\n' +
+    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
+    '        <md-checkbox class="lp16 m8"\n' +
+    '                     ng-model="item.disabled"\n' +
+    '                     ng-true-value="false"\n' +
+    '                     ng-false-value="true"\n' +
+    '                     ng-if="interactive"\n' +
+    '                     aria-label="{{ item.label }}">\n' +
+    '            <p class="legend-item-value"\n' +
+    '               ng-style="{\'background-color\': item.color}">\n' +
+    '                {{ item.value }}\n' +
+    '            </p>\n' +
+    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
+    '        </md-checkbox>\n' +
+    '\n' +
+    '        <div ng-if="!interactive">\n' +
+    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
+    '            <span>{{:: item.label || item.key}}</span>\n' +
+    '        </div>\n' +
     '    </div>\n' +
     '</div>');
 }]);
@@ -46,18 +55,50 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
     '<div class="line-chart" flex="auto" layout="column">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
+    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
+    '    </svg>\n' +
     '</div>\n' +
     '\n' +
-    '<div class="pip-chart-legend">\n' +
-    '    <div class="legend-title" ng-repeat="item in lineChart.data">\n' +
-    '        <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '        <span>{{:: item.key}}</span>\n' +
-    '    </div>\n' +
-    '</div>\n' +
+    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
     '');
 }]);
 })();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" flex="auto" layout="column">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
+}]);
+})();
+
+/**
+ * @file Registration of chart WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+
+/* global angular */
+
+(function (angular) {
+    'use strict';
+
+    angular.module('pipCharts', [
+        'pipBarCharts',
+        'pipLineCharts',
+        'pipPieCharts',
+        'pipChartLegends'
+    ]);
+
+})(window.angular);
+
 
 (function () {
     'use strict';
@@ -229,6 +270,83 @@ module.run(['$templateCache', function($templateCache) {
 
     /**
      * @ngdoc module
+     * @name pipLegends
+     *
+     * @description
+     * Legend of charts
+     */
+    angular.module('pipChartLegends', [])
+        .directive('pipChartLegend', pipChartLegend);
+
+    function pipChartLegend() {
+        return {
+            restrict: 'E',
+            scope: {
+                series: '=pipSeries',
+                interactive: '=pipInteractive'
+            },
+            templateUrl: 'legend/interactive_legend.html',
+            controller: ['$element', '$scope', '$timeout', '$mdColorPalette', function ($element, $scope, $timeout, $mdColorPalette) {
+                var colors = _.map($mdColorPalette, function (palette) {
+                    return palette[500].hex;
+                });
+
+                function colorCheckboxes() {
+                    var checkboxContainers = $($element).find('md-checkbox .md-container');
+                    
+                    checkboxContainers.each(function (index, item) {
+                        $(item)
+                            .css('color', $scope.series[index].color || colors[index])
+                            .find('.md-icon')
+                            .css('background-color', $scope.series[index].color || colors[index]);
+                    });
+                }
+
+                function animate() {
+                    var legendTitles = $($element).find('.chart-legend-item');
+
+                    legendTitles.each(function (index, item) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
+                }
+                
+                function prepareSeries() {
+                    $scope.series.forEach(function (item, index) {
+                        item.color = item.color || colors[index];
+                        item.disabled = item.disabled || false;
+                    });   
+                }
+
+                $scope.$watch('series', function () {
+                    $timeout(function () {
+                        animate();
+                        colorCheckboxes();
+                    }, 0);
+                    prepareSeries();
+                }, true);
+
+                $scope.$watch('interactive', function (newValue, oldValue) {
+                    if (newValue == true && newValue != oldValue) {
+                        $timeout(colorCheckboxes, 0);
+                    }
+                });
+
+                $timeout(function () {
+                    animate();
+                    colorCheckboxes();
+                }, 0);
+                prepareSeries();
+            }]
+        };
+    }
+})();
+(function () {
+    'use strict';
+
+    /**
+     * @ngdoc module
      * @name pipLineCharts
      *
      * @description
@@ -241,7 +359,9 @@ module.run(['$templateCache', function($templateCache) {
         return {
             restrict: 'E',
             scope: {
-                series: '=pipSeries'
+                series: '=pipSeries',
+                showYAxis: '=pipYAxis',
+                showXAxis: '=pipXAxis'
             },
             bindToController: true,
             controllerAs: 'lineChart',
@@ -255,7 +375,15 @@ module.run(['$templateCache', function($templateCache) {
                 });
 
                 vm.data = vm.series || [];
+                
+                vm.isVisibleX = function () {
+                    return vm.showXAxis == undefined ? true : vm.showXAxis; 
+                };
 
+                vm.isVisibleY = function () {
+                    return vm.showYAxis == undefined ? true : vm.showYAxis;
+                };
+                
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
@@ -292,7 +420,7 @@ module.run(['$templateCache', function($templateCache) {
                             return d.value;
                         })
                         .height(270)
-                        .interactive(true)
+                        .useInteractiveGuideline(true)
                         .showXAxis(true)
                         .showYAxis(true)
                         .showLegend(false)
@@ -305,12 +433,12 @@ module.run(['$templateCache', function($templateCache) {
 
                     chart.yAxis
                         .tickFormat(function (d) {
-                            return Math.round(d % 1 * 100);
+                            return d / 1000 + 'k';
                         });
 
                     chart.xAxis
                         .tickFormat(function (d) {
-                            return Math.round(d);
+                            return d;
                         });
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
@@ -342,6 +470,174 @@ module.run(['$templateCache', function($templateCache) {
                         + $mdColorPalette[color][500].value[2] + ','
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
+
+                /**
+                 * Helpful method
+                 * @private
+                 */
+                function generateParameterColor() {
+                    vm.data.forEach(function (item, index) {
+                        item.color = item.color || materialColorToRgba(colors[index]);
+                    });
+                }
+            }]
+        };
+    }
+})();
+(function () {
+    'use strict';
+
+    /**
+     * @ngdoc module
+     * @name pipPieCharts
+     *
+     * @description
+     * Line chart on top of Rickshaw charts
+     */
+    angular.module('pipPieCharts', [])
+        .directive('pipPieChart', pipPieChart);
+
+    function pipPieChart() {
+        return {
+            restrict: 'E',
+            scope: {
+                series: '=pipSeries'
+            },
+            bindToController: true,
+            controllerAs: 'pieChart',
+            templateUrl: 'pie/pie_chart.html',
+            controller: ['$element', '$scope', '$timeout', '$interval', '$mdColorPalette', function ($element, $scope, $timeout, $interval, $mdColorPalette) {
+                var vm               = this;
+                var chart            = null;
+                var titleElem        = null;
+                var chartElem        = null;
+                var colors           = _.map($mdColorPalette, function (palette, color) {
+                    return color;
+                });
+                var resizeTitleLabel = resizeTitleLabelUnwrap;
+
+                vm.data = vm.data || [];
+
+                if (vm.series.length > colors.length) {
+                    vm.data = vm.series.slice(0, 9);
+                }
+
+                $scope.$watch('pieChart.series', function (newVal) {
+                    vm.data = newVal;
+
+                    generateParameterColor();
+
+                    if (chart) {
+                        chartElem.datum(vm.data).call(chart);
+                        $timeout(resizeTitleLabel);
+                    }
+                }, true);
+
+                // Sets colors of items
+                generateParameterColor();
+
+                d3.scale.paletteColors = function () {
+                    return d3.scale.ordinal().range(colors.map(materialColorToRgba));
+                };
+
+                /**
+                 * Instantiate chart
+                 */
+                nv.addGraph(function () {
+                    chart = nv.models.pieChart()
+                        .margin({ top: 0, right: 0, bottom: 0, left: 0 })
+                        .x(function (d) {
+                            return d.value;
+                        })
+                        .y(function (d) {
+                            return d.value;
+                        })
+                        .height(250)
+                        .width(250)
+                        .showLabels(true)
+                        .labelThreshold(.001)
+                        .growOnHover(false)
+                        .donut(true)
+                        .donutRatio(0.5)
+                        .color(function(d) {
+                            return d.color || d3.scale.paletteColors().range();
+                        });
+
+                    chart.tooltip.enabled(false);
+                    chart.noData('No data for this moment...');
+                    chart.showLegend(false);
+
+                    chartElem = d3.select($element.get(0))
+                        .select('.pie-chart svg')
+                        .attr('height', 250)
+                        .style('opacity', 0)
+                        .datum(vm.data)
+                        .call(chart);
+
+                    nv.utils.windowResize(function () {
+                        chart.update();
+                        $timeout(resizeTitleLabel);
+                    });
+
+                    return chart;
+                }, function () {
+                    $timeout(renderTotalLabel);
+                });
+
+                function renderTotalLabel() {
+                    var legendTitles = d3.selectAll('.legend-title')[0];
+                    var svgElem  = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                    var totalVal = vm.data.reduce(function (sum, curr) {
+                        return sum + curr.value;
+                    }, 0);
+
+                    d3.select(svgElem)
+                        .select('.nv-pie:not(.nvd3)')
+                        .append('text')
+                        .classed('label-total', true)
+                        .attr('text-anchor', 'middle')
+                        .style('dominant-baseline', 'central')
+                        .text(totalVal);
+                    
+                    d3.select(svgElem)
+                        .transition()
+                        .duration(1000)
+                        .style('opacity', 1);
+
+                    titleElem = d3.select($element.find('text.label-total').get(0));
+                    resizeTitleLabel();
+
+                    legendTitles.forEach(function (item, index) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
+                }
+
+                function resizeTitleLabelUnwrap() {
+                    var boxSize = $element.find('.nv-pieLabels').get(0).getBBox();
+
+                    if (!boxSize.width || !boxSize.height) {
+                        return;
+                    }
+
+                    titleElem.style('font-size', ~~boxSize.width / 2);
+                }
+
+                /**
+                 * Converts palette color name into RGBA color representation.
+                 * Should by replaced by palette for charts.
+                 *
+                 * @param {string} color    Name of color from AM palette
+                 * @returns {string} RGBa format
+                 */
+                function materialColorToRgba(color) {
+                    return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
+                        + $mdColorPalette[color][500].value[1] + ','
+                        + $mdColorPalette[color][500].value[2] + ','
+                        + ($mdColorPalette[color][500].value[3] || 1) + ')';
+                }
+
 
                 /**
                  * Helpful method
