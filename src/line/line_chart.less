@@ -1,0 +1,65 @@
+pip-line-chart {
+  .nvd3 {
+    .nv-axis {
+      line {
+        stroke-dasharray: 3, 3;
+        stroke: rgba(0, 0, 0, 0.12);
+      }
+
+      .tick.zero {
+        opacity: 0 !important;
+      }
+
+      path {
+        stroke: rgba(0, 0, 0, 0.26);
+      }
+
+      text {
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: 500 !important;
+        fill: rgba(0, 0, 0, 0.54);
+      }
+    }
+
+    .nv-x {
+      .tick:not(.zero) {
+        line {
+          opacity: 0;
+        }
+      }
+    }
+
+    .nv-y {
+      .tick:not(.zero) {
+        line {
+          opacity: 0;
+        }
+      }
+    }
+  }
+
+  .visible-x-axis {
+    .nvd3 {
+      .nv-x {
+        .tick:not(.zero) {
+          line {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+
+  .visible-y-axis {
+    .nvd3 {
+      .nv-y {
+        .tick:not(.zero) {
+          line {
+            opacity: 1;
+          }
+        }
+      }
+    }
+  }
+}

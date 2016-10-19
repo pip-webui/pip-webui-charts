@@ -15,7 +15,9 @@
         return {
             restrict: 'E',
             scope: {
-                series: '=pipSeries'
+                series: '=pipSeries',
+                showYAxis: '=pipYAxis',
+                showXAxis: '=pipXAxis'
             },
             bindToController: true,
             controllerAs: 'lineChart',
@@ -29,7 +31,15 @@
                 });
 
                 vm.data = vm.series || [];
+                
+                vm.isVisibleX = function () {
+                    return vm.showXAxis == undefined ? true : vm.showXAxis; 
+                };
 
+                vm.isVisibleY = function () {
+                    return vm.showYAxis == undefined ? true : vm.showYAxis;
+                };
+                
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
@@ -101,12 +111,6 @@
                             $(item).addClass('visible');
                         }, 200 * index);
                     });
-
-                    d3.select('.nv-groups')
-                        .on('mouseenter', function () {
-                            console.log('1', d3.select(d3.select('.nv-interactiveGuideLine')[0][0]));
-                            console.log('2', d3.select('.nv-interactiveGuideLine')[0][0]);
-                        })
                 });
 
                 /**

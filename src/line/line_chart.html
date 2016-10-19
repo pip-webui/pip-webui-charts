@@ -1,5 +1,6 @@
 <div class="line-chart" flex="auto" layout="column">
-    <svg class="flex-auto"></svg>
+    <svg class="flex-auto" ng-class="{'visible-x-axis': lineChart.isVisibleX(), 'visible-y-axis': lineChart.isVisibleY()}">
+    </svg>
 </div>
 
 <pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>

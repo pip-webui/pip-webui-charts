@@ -7,6 +7,9 @@
 
     thisModule.controller('LineChartController',
         function ($scope) {
+            $scope.showX = true;
+            $scope.showY = true;
+            
             $scope.series = [{
                 key: 'Completed',
                 values: [

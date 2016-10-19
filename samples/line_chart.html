@@ -1,3 +1,6 @@
 <h3>Line chart</h3>
 
-<pip-line-chart pip-series="series"></pip-line-chart>
+<md-switch ng-model="showX">Show X Axis</md-switch>
+<md-switch ng-model="showY">Show Y Axis</md-switch>
+
+<pip-line-chart pip-series="series" pip-y-axis="showY" pip-x-axis="showX"></pip-line-chart>
