@@ -10,12 +10,12 @@
                ng-style="{'background-color': item.color}">
                 {{ item.value }}
             </p>
-            <p class="legend-item-label">{{ item.label }}</p>
+            <p class="legend-item-label">{{:: item.label || item.key }}</p>
         </md-checkbox>
 
         <div ng-if="!interactive">
             <span class="bullet" ng-style="{'background-color': item.color}"></span>
-            <span>{{:: item.label}}</span>
+            <span>{{:: item.label || item.key}}</span>
         </div>
     </div>
 </div>

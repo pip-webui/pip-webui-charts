@@ -35,7 +35,7 @@
                     });
                 }
 
-                function animateAndColor() {
+                function animate() {
                     var legendTitles = $($element).find('.chart-legend-item');
 
                     legendTitles.each(function (index, item) {
@@ -44,22 +44,33 @@
                         }, 200 * index);
                     });
                 }
+                
+                function prepareSeries() {
+                    $scope.series.forEach(function (item, index) {
+                        item.color = item.color || colors[index];
+                        item.disabled = item.disabled || false;
+                    });   
+                }
 
-                $timeout(function () {
-                    animateAndColor();
-                    colorCheckboxes();
-                }, 0);
-
-                $scope.series.forEach(function (item, index) {
-                    item.color = item.color || colors[index];
-                    item.disabled = item.disabled || false;
-                });
+                $scope.$watch('series', function () {
+                    $timeout(function () {
+                        animate();
+                        colorCheckboxes();
+                    }, 0);
+                    prepareSeries();
+                }, true);
 
                 $scope.$watch('interactive', function (newValue, oldValue) {
                     if (newValue == true && newValue != oldValue) {
                         $timeout(colorCheckboxes, 0);
                     }
                 });
+
+                $timeout(function () {
+                    animate();
+                    colorCheckboxes();
+                }, 0);
+                prepareSeries();
             }
         };
     }

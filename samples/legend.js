@@ -26,6 +26,13 @@
                     color: '#ef5350'
                 }
             ];
+
+            $scope.add = function () {
+                $scope.series.push({
+                    label: 'Errors ' + $scope.series.length,
+                    value: 5 * $scope.series.length
+                });
+            }
         })
 
 

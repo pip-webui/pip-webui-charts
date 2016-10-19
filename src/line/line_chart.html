@@ -2,9 +2,4 @@
     <svg class="flex-auto"></svg>
 </div>
 
-<div class="pip-chart-legend">
-    <div class="legend-title" ng-repeat="item in lineChart.data">
-        <span class="bullet" ng-style="{'background-color': item.color}"></span>
-        <span>{{:: item.key}}</span>
-    </div>
-</div>
+<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>
