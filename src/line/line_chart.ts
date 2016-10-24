@@ -49,7 +49,7 @@
                 // Sets colors of items
                 generateParameterColor();
 
-                d3.scale.paletteColors = function () {
+                (<any>d3.scale).paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
 
@@ -81,7 +81,7 @@
                         .showYAxis(true)
                         .showLegend(false)
                         .color(function(d) {
-                            return d.color || d3.scale.paletteColors().range();
+                            return d.color || (<any>d3.scale).paletteColors().range();
                         });
 
                     chart.tooltip.enabled(false);
@@ -166,8 +166,8 @@
                     function zoomed() {
                         console.log('event', d3.event);
 
-                        if (d3.event.sourceEvent.type === 'wheel') {
-                            if (d3.event.scale === 1) {
+                        if ((<any>d3.event).sourceEvent.type === 'wheel') {
+                            if ((<any>d3.event).scale === 1) {
                                 unzoomed();
                             } else {
                                 yDomain(fixDomain(yScale.domain(), y_boundary));

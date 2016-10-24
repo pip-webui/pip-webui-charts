@@ -50,7 +50,7 @@
                 // Sets colors of items
                 generateParameterColor();
 
-                d3.scale.paletteColors = function () {
+                (<any>d3.scale).paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
 
@@ -74,7 +74,7 @@
                         .donut(true)
                         .donutRatio(0.5)
                         .color(function(d) {
-                            return d.color || d3.scale.paletteColors().range();
+                            return d.color || (<any>d3.scale).paletteColors().range();
                         });
 
                     chart.tooltip.enabled(false);

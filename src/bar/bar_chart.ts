@@ -42,7 +42,7 @@
                 // Sets colors of items
                 generateParameterColor();
 
-                d3.scale.paletteColors = function () {
+                (<any>d3.scale).paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
 
@@ -54,7 +54,8 @@
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         chart.update();
-                        intervalUpdate(chart.update, 10);
+                        // Todo: the method does not exist
+                        //intervalUpdate(chart.update, 10);
                     }
                 });
 
@@ -70,11 +71,11 @@
                         .showValues(true)
                         .showXAxis(false)
                         .showYAxis(false)
-                        .valueFormat(d3.format('d'))
+                        .valueFormat(<any>d3.format('d'))
                         .duration(0)
                         .height(270)
                         .color(function(d) {
-                            return d.color || d3.scale.paletteColors().range();
+                            return d.color || (<any>d3.scale).paletteColors().range();
                         });
 
                     chart.tooltip.enabled(false);
@@ -105,12 +106,12 @@
                     var labels = d3.selectAll('.nv-bar text')[0],
                         chartBars = d3.selectAll('.nv-bar')[0],
                         legendTitles = d3.selectAll('.legend-title')[0],
-                        parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
+                        parentHeight = (<any>d3.select('.nvd3-svg')[0][0]).getBBox().height;
 
                     d3.select('.bar-chart').classed('visible', true);
 
                     chartBars.forEach(function (item, index) {
-                        var barSize = item.getBBox(),
+                        var barSize = (<any>item).getBBox(),
                             element = d3.select(item),
                             y = d3.transform(element.attr('transform')).translate[1];
                         

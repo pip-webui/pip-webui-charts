@@ -5,7 +5,7 @@
 
 /* global angular */
 
-(function (angular) {
+(function () {
     'use strict';
 
     angular.module('pipCharts', [
@@ -15,5 +15,5 @@
         'pipChartLegends'
     ]);
 
-})(window.angular);
+})();
 
