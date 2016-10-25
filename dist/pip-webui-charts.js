@@ -21,6 +21,38 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('legend/interactive_legend.html',
+    '<div >\n' +
+    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
+    '        <md-checkbox class="lp16 m8"\n' +
+    '                     ng-model="item.disabled"\n' +
+    '                     ng-true-value="false"\n' +
+    '                     ng-false-value="true"\n' +
+    '                     ng-if="interactive"\n' +
+    '                     aria-label="{{ item.label }}">\n' +
+    '            <p class="legend-item-value"\n' +
+    '               ng-style="{\'background-color\': item.color}">\n' +
+    '                {{ item.value }}\n' +
+    '            </p>\n' +
+    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
+    '        </md-checkbox>\n' +
+    '\n' +
+    '        <div ng-if="!interactive">\n' +
+    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
+    '            <span>{{:: item.label || item.key}}</span>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
@@ -45,38 +77,6 @@ module.run(['$templateCache', function($templateCache) {
     '</div>\n' +
     '\n' +
     '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('legend/interactive_legend.html',
-    '<div >\n' +
-    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
-    '        <md-checkbox class="lp16 m8"\n' +
-    '                     ng-model="item.disabled"\n' +
-    '                     ng-true-value="false"\n' +
-    '                     ng-false-value="true"\n' +
-    '                     ng-if="interactive"\n' +
-    '                     aria-label="{{ item.label }}">\n' +
-    '            <p class="legend-item-value"\n' +
-    '               ng-style="{\'background-color\': item.color}">\n' +
-    '                {{ item.value }}\n' +
-    '            </p>\n' +
-    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
-    '        </md-checkbox>\n' +
-    '\n' +
-    '        <div ng-if="!interactive">\n' +
-    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '            <span>{{:: item.label || item.key}}</span>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
 }]);
 })();
 
@@ -189,6 +189,67 @@ module.run(['$templateCache', function($templateCache) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
+            }]
+        };
+    }
+})();
+
+(function () {
+    'use strict';
+    angular.module('pipChartLegends', [])
+        .directive('pipChartLegend', pipChartLegend);
+    function pipChartLegend() {
+        return {
+            restrict: 'E',
+            scope: {
+                series: '=pipSeries',
+                interactive: '=pipInteractive'
+            },
+            templateUrl: 'legend/interactive_legend.html',
+            controller: ['$element', '$scope', '$timeout', '$mdColorPalette', function ($element, $scope, $timeout, $mdColorPalette) {
+                var colors = _.map($mdColorPalette, function (palette) {
+                    return palette[500].hex;
+                });
+                function colorCheckboxes() {
+                    var checkboxContainers = $($element).find('md-checkbox .md-container');
+                    checkboxContainers.each(function (index, item) {
+                        $(item)
+                            .css('color', $scope.series[index].color || colors[index])
+                            .find('.md-icon')
+                            .css('background-color', $scope.series[index].color || colors[index]);
+                    });
+                }
+                function animate() {
+                    var legendTitles = $($element).find('.chart-legend-item');
+                    legendTitles.each(function (index, item) {
+                        $timeout(function () {
+                            $(item).addClass('visible');
+                        }, 200 * index);
+                    });
+                }
+                function prepareSeries() {
+                    $scope.series.forEach(function (item, index) {
+                        item.color = item.color || colors[index];
+                        item.disabled = item.disabled || false;
+                    });
+                }
+                $scope.$watch('series', function () {
+                    $timeout(function () {
+                        animate();
+                        colorCheckboxes();
+                    }, 0);
+                    prepareSeries();
+                }, true);
+                $scope.$watch('interactive', function (newValue, oldValue) {
+                    if (newValue == true && newValue != oldValue) {
+                        $timeout(colorCheckboxes, 0);
+                    }
+                });
+                $timeout(function () {
+                    animate();
+                    colorCheckboxes();
+                }, 0);
+                prepareSeries();
             }]
         };
     }
@@ -471,67 +532,6 @@ module.run(['$templateCache', function($templateCache) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
-            }]
-        };
-    }
-})();
-
-(function () {
-    'use strict';
-    angular.module('pipChartLegends', [])
-        .directive('pipChartLegend', pipChartLegend);
-    function pipChartLegend() {
-        return {
-            restrict: 'E',
-            scope: {
-                series: '=pipSeries',
-                interactive: '=pipInteractive'
-            },
-            templateUrl: 'legend/interactive_legend.html',
-            controller: ['$element', '$scope', '$timeout', '$mdColorPalette', function ($element, $scope, $timeout, $mdColorPalette) {
-                var colors = _.map($mdColorPalette, function (palette) {
-                    return palette[500].hex;
-                });
-                function colorCheckboxes() {
-                    var checkboxContainers = $($element).find('md-checkbox .md-container');
-                    checkboxContainers.each(function (index, item) {
-                        $(item)
-                            .css('color', $scope.series[index].color || colors[index])
-                            .find('.md-icon')
-                            .css('background-color', $scope.series[index].color || colors[index]);
-                    });
-                }
-                function animate() {
-                    var legendTitles = $($element).find('.chart-legend-item');
-                    legendTitles.each(function (index, item) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
-                    });
-                }
-                function prepareSeries() {
-                    $scope.series.forEach(function (item, index) {
-                        item.color = item.color || colors[index];
-                        item.disabled = item.disabled || false;
-                    });
-                }
-                $scope.$watch('series', function () {
-                    $timeout(function () {
-                        animate();
-                        colorCheckboxes();
-                    }, 0);
-                    prepareSeries();
-                }, true);
-                $scope.$watch('interactive', function (newValue, oldValue) {
-                    if (newValue == true && newValue != oldValue) {
-                        $timeout(colorCheckboxes, 0);
-                    }
-                });
-                $timeout(function () {
-                    animate();
-                    colorCheckboxes();
-                }, 0);
-                prepareSeries();
             }]
         };
     }
