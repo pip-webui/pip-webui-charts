@@ -27,6 +27,7 @@
                 var vm        = this;
                 var chart     = null;
                 var chartElem = null;
+                var setZoom = null;
                 var colors    = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
@@ -40,6 +41,18 @@
 
                 vm.isVisibleY = function () {
                     return vm.showYAxis == undefined ? true : vm.showYAxis;
+                };
+
+                vm.zoomIn = function () {
+                    if (setZoom) {
+                        setZoom('in');
+                    }
+                };
+
+                vm.zoomOut = function () {
+                    if (setZoom) {
+                        setZoom('out');
+                    }
                 };
                 
                 if (vm.series.length > colors.length) {
@@ -94,7 +107,7 @@
 
                     chart.xAxis
                         .tickFormat(function (d) {
-                            return d;
+                            return d.toFixed(2);
                         });
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
@@ -190,6 +203,33 @@
                         }
                     }
 
+                    //
+                    setZoom = function(which) {
+                        var center0 = [svg[0][0].getBBox().width / 2, svg[0][0].getBBox().height / 2];
+                        var translate0 = d3zoom.translate(), coordinates0 = coordinates(center0);
+
+                        if (which === 'in') {
+                            if (prevScale < scaleExtent) d3zoom.scale(prevScale + 0.2);
+                        } else {
+                            if (prevScale > 1) d3zoom.scale(prevScale - 0.2);
+                        }
+
+                        var center1 = point(coordinates0);
+                        d3zoom.translate([translate0[0] + center0[0] - center1[0], translate0[1] + center0[1] - center1[1]]);
+
+                        d3zoom.event(svg);
+                    };
+
+                    function coordinates(point) {
+                        var scale = d3zoom.scale(), translate = d3zoom.translate();
+                        return [(point[0] - translate[0]) / scale, (point[1] - translate[1]) / scale];
+                    }
+
+                    function point(coordinates) {
+                        var scale = d3zoom.scale(), translate = d3zoom.translate();
+                        return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
+                    }
+
                     // zoom event handler
                     function unzoomed() {
                         xDomain(x_boundary);
@@ -209,6 +249,7 @@
 
                     // add handler
                     svg.call(d3zoom).on('dblclick.zoom', unzoomed);
+                    $($element.get(0)).addClass('dynamic');
                 }
 
                 /**

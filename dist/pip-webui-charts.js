@@ -57,6 +57,12 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
     '    </svg>\n' +
+    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
+    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
+    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
     '</div>\n' +
     '\n' +
     '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
@@ -179,7 +185,7 @@ module.run(['$templateCache', function($templateCache) {
                  * @return {void}
                  */
                 function configBarWidthAndLabel() {
-                    var labels = d3.selectAll('.nv-bar text')[0], chartBars = d3.selectAll('.nv-bar')[0], legendTitles = d3.selectAll('.legend-title')[0], parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
+                    var labels = d3.selectAll('.nv-bar text')[0], chartBars = d3.selectAll('.nv-bar')[0], parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
                     d3.select('.bar-chart').classed('visible', true);
                     chartBars.forEach(function (item, index) {
                         var barSize = item.getBBox(), element = d3.select(item), y = d3.transform(element.attr('transform')).translate[1];
@@ -194,11 +200,6 @@ module.run(['$templateCache', function($templateCache) {
                         d3.select(labels[index])
                             .attr('dy', barSize.height / 2)
                             .attr('x', 19);
-                    });
-                    legendTitles.forEach(function (item, index) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
                     });
                 }
                 /**
@@ -313,7 +314,8 @@ module.run(['$templateCache', function($templateCache) {
             scope: {
                 series: '=pipSeries',
                 showYAxis: '=pipYAxis',
-                showXAxis: '=pipXAxis'
+                showXAxis: '=pipXAxis',
+                dynamic: '=pipDynamic'
             },
             bindToController: true,
             controllerAs: 'lineChart',
@@ -322,20 +324,31 @@ module.run(['$templateCache', function($templateCache) {
                 var vm = this;
                 var chart = null;
                 var chartElem = null;
+                var setZoom = null;
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
                 vm.data = vm.series || [];
+                vm.sourceEvents = [];
                 vm.isVisibleX = function () {
                     return vm.showXAxis == undefined ? true : vm.showXAxis;
                 };
                 vm.isVisibleY = function () {
                     return vm.showYAxis == undefined ? true : vm.showYAxis;
                 };
+                vm.zoomIn = function () {
+                    if (setZoom) {
+                        setZoom('in');
+                    }
+                };
+                vm.zoomOut = function () {
+                    if (setZoom) {
+                        setZoom('out');
+                    }
+                };
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                //colors = _.sample(colors, colors.length);
                 // Sets colors of items
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
@@ -361,7 +374,7 @@ module.run(['$templateCache', function($templateCache) {
                         return d.value;
                     })
                         .height(270)
-                        .useInteractiveGuideline(true)
+                        .interactive(true)
                         .showXAxis(true)
                         .showYAxis(true)
                         .showLegend(false)
@@ -376,27 +389,24 @@ module.run(['$templateCache', function($templateCache) {
                     });
                     chart.xAxis
                         .tickFormat(function (d) {
-                        return d;
+                        return d.toFixed(2);
                     });
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
                     chartElem.datum(vm.data).style('height', 270).call(chart);
-                    addZoom({
-                        xAxis: chart.xAxis,
-                        yAxis: chart.yAxis,
-                        yDomain: chart.yDomain,
-                        xDomain: chart.xDomain,
-                        redraw: function () { chart.update(); },
-                        svg: chartElem
-                    });
+                    if (vm.dynamic) {
+                        addZoom({
+                            xAxis: chart.xAxis,
+                            yAxis: chart.yAxis,
+                            yDomain: chart.yDomain,
+                            xDomain: chart.xDomain,
+                            redraw: function () {
+                                chart.update();
+                            },
+                            svg: chartElem
+                        });
+                    }
                     nv.utils.windowResize(chart.update);
                     return chart;
-                }, function () {
-                    var legendTitles = d3.selectAll('.legend-title')[0];
-                    legendTitles.forEach(function (item, index) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
-                    });
                 });
                 function addZoom(options) {
                     // scaleExtent
@@ -413,39 +423,79 @@ module.run(['$templateCache', function($templateCache) {
                     var xScale = xAxis.scale();
                     var yScale = yAxis.scale();
                     // min/max boundaries
-                    var x_boundary = xScale.domain().slice();
-                    var y_boundary = yScale.domain().slice();
+                    var x_boundary = xAxis.scale().domain().slice();
+                    var y_boundary = yAxis.scale().domain().slice();
                     // create d3 zoom handler
                     var d3zoom = d3.behavior.zoom();
+                    var prevXDomain = x_boundary;
+                    var prevScale = d3zoom.scale();
+                    var prevTranslate = d3zoom.translate();
                     // ensure nice axis
                     xScale.nice();
                     yScale.nice();
                     // fix domain
-                    function fixDomain(domain, boundary) {
-                        if (discrete) {
-                            domain[0] = parseInt(domain[0]);
-                            domain[1] = parseInt(domain[1]);
+                    function fixDomain(domain, boundary, scale, translate) {
+                        if (domain[0] < boundary[0]) {
+                            domain[0] = boundary[0];
+                            if (prevXDomain[0] !== boundary[0] || scale !== prevScale) {
+                                domain[1] += (boundary[0] - domain[0]);
+                            }
+                            else {
+                                domain[1] = prevXDomain[1];
+                                translate = _.clone(prevTranslate);
+                            }
                         }
-                        domain[0] = Math.min(Math.max(domain[0], boundary[0]), boundary[1] - boundary[1] / scaleExtent);
-                        domain[1] = Math.max(boundary[0] + boundary[1] / scaleExtent, Math.min(domain[1], boundary[1]));
+                        if (domain[1] > boundary[1]) {
+                            domain[1] = boundary[1];
+                            if (prevXDomain[1] !== boundary[1] || scale !== prevScale) {
+                                domain[0] -= (domain[1] - boundary[1]);
+                            }
+                            else {
+                                domain[0] = prevXDomain[0];
+                                translate = _.clone(prevTranslate);
+                            }
+                        }
+                        d3zoom.translate(translate);
+                        prevXDomain = _.clone(domain);
+                        prevScale = _.clone(scale);
+                        prevTranslate = _.clone(translate);
                         return domain;
                     }
                     // zoom event handler
                     function zoomed() {
-                        console.log('event', d3.event);
-                        if (d3.event.sourceEvent.type === 'wheel') {
-                            if (d3.event.scale === 1) {
-                                unzoomed();
-                            }
-                            else {
-                                yDomain(fixDomain(yScale.domain(), y_boundary));
-                                xDomain(fixDomain(xScale.domain(), x_boundary));
-                                redraw();
-                            }
+                        // Switch off vertical zooming temporary
+                        // yDomain(yScale.domain());
+                        if (d3.event.scale === 1) {
+                            unzoomed();
                         }
                         else {
-                            console.log('mousemove');
+                            xDomain(fixDomain(xScale.domain(), x_boundary, d3.event.scale, d3.event.translate));
+                            redraw();
                         }
+                    }
+                    //
+                    setZoom = function (which) {
+                        var center0 = [svg[0][0].getBBox().width / 2, svg[0][0].getBBox().height / 2];
+                        var translate0 = d3zoom.translate(), coordinates0 = coordinates(center0);
+                        if (which === 'in') {
+                            if (prevScale < scaleExtent)
+                                d3zoom.scale(prevScale + 0.2);
+                        }
+                        else {
+                            if (prevScale > 1)
+                                d3zoom.scale(prevScale - 0.2);
+                        }
+                        var center1 = point(coordinates0);
+                        d3zoom.translate([translate0[0] + center0[0] - center1[0], translate0[1] + center0[1] - center1[1]]);
+                        d3zoom.event(svg);
+                    };
+                    function coordinates(point) {
+                        var scale = d3zoom.scale(), translate = d3zoom.translate();
+                        return [(point[0] - translate[0]) / scale, (point[1] - translate[1]) / scale];
+                    }
+                    function point(coordinates) {
+                        var scale = d3zoom.scale(), translate = d3zoom.translate();
+                        return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
                     }
                     // zoom event handler
                     function unzoomed() {
@@ -454,6 +504,8 @@ module.run(['$templateCache', function($templateCache) {
                         redraw();
                         d3zoom.scale(1);
                         d3zoom.translate([0, 0]);
+                        prevScale = 1;
+                        prevTranslate = [0, 0];
                     }
                     // initialize wrapper
                     d3zoom.x(xScale)
@@ -461,7 +513,8 @@ module.run(['$templateCache', function($templateCache) {
                         .scaleExtent([1, scaleExtent])
                         .on('zoom', zoomed);
                     // add handler
-                    d3.select($element.get(0)).call(d3zoom).on('dblclick.zoom', unzoomed);
+                    svg.call(d3zoom).on('dblclick.zoom', unzoomed);
+                    $($element.get(0)).addClass('dynamic');
                 }
                 /**
                  * Converts palette color name into RGBA color representation.
@@ -576,7 +629,6 @@ module.run(['$templateCache', function($templateCache) {
                     $timeout(renderTotalLabel);
                 });
                 function renderTotalLabel() {
-                    var legendTitles = d3.selectAll('.legend-title')[0];
                     var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
@@ -594,11 +646,6 @@ module.run(['$templateCache', function($templateCache) {
                         .style('opacity', 1);
                     titleElem = d3.select($element.find('text.label-total').get(0));
                     resizeTitleLabel();
-                    legendTitles.forEach(function (item, index) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
-                    });
                 }
                 function resizeTitleLabelUnwrap() {
                     var boxSize = $element.find('.nv-pieLabels').get(0).getBBox();

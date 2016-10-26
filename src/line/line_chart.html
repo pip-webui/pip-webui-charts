@@ -1,6 +1,12 @@
 <div class="line-chart" flex="auto" layout="column">
     <svg class="flex-auto" ng-class="{'visible-x-axis': lineChart.isVisibleX(), 'visible-y-axis': lineChart.isVisibleY()}">
     </svg>
+    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">
+        <md-icon md-svg-icon="icons:minus-circle"></md-icon>
+    </md-button>
+    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">
+        <md-icon md-svg-icon="icons:plus-circle"></md-icon>
+    </md-button>
 </div>
 
 <pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>

@@ -62,4 +62,41 @@ pip-line-chart {
       }
     }
   }
+
+  .minus-button, .plus-button {
+    display: none;
+  }
+
+  &.dynamic {
+    .line-chart {
+      position: relative;
+      .minus-button, .plus-button {
+        display: block;
+        position: absolute;
+        bottom: 20px;
+        background-color: transparent;
+        color: rgba(0, 0, 0, 0.54);
+        md-icon {
+          color: rgba(0, 0, 0, 0.54);
+        }
+        box-shadow: none;
+        &:hover, &.md-focused {
+          background-color: transparent;
+          box-shadow: none;
+        }
+      }
+
+      .minus-button {
+        right: 70px;
+      }
+
+      .plus-button {
+        right: 20px;
+      }
+    }
+
+    svg {
+      cursor: move;
+    }
+  }
 }

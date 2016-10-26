@@ -94,6 +94,42 @@ pip-line-chart .visible-x-axis .nvd3 .nv-x .tick:not(.zero) line {
 pip-line-chart .visible-y-axis .nvd3 .nv-y .tick:not(.zero) line {
   opacity: 1;
 }
+pip-line-chart .minus-button,
+pip-line-chart .plus-button {
+  display: none;
+}
+pip-line-chart.dynamic .line-chart {
+  position: relative;
+}
+pip-line-chart.dynamic .line-chart .minus-button,
+pip-line-chart.dynamic .line-chart .plus-button {
+  display: block;
+  position: absolute;
+  bottom: 20px;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.54);
+  box-shadow: none;
+}
+pip-line-chart.dynamic .line-chart .minus-button md-icon,
+pip-line-chart.dynamic .line-chart .plus-button md-icon {
+  color: rgba(0, 0, 0, 0.54);
+}
+pip-line-chart.dynamic .line-chart .minus-button:hover,
+pip-line-chart.dynamic .line-chart .plus-button:hover,
+pip-line-chart.dynamic .line-chart .minus-button.md-focused,
+pip-line-chart.dynamic .line-chart .plus-button.md-focused {
+  background-color: transparent;
+  box-shadow: none;
+}
+pip-line-chart.dynamic .line-chart .minus-button {
+  right: 70px;
+}
+pip-line-chart.dynamic .line-chart .plus-button {
+  right: 20px;
+}
+pip-line-chart.dynamic svg {
+  cursor: move;
+}
 pip-pie-chart .nvd3.nv-pie path {
   fill-opacity: 1 !important;
 }
