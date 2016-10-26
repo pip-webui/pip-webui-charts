@@ -99,7 +99,6 @@
                 });
 
                 function renderTotalLabel() {
-                    var legendTitles = d3.selectAll('.legend-title')[0];
                     var svgElem  = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
@@ -120,12 +119,6 @@
 
                     titleElem = d3.select($element.find('text.label-total').get(0));
                     resizeTitleLabel();
-
-                    legendTitles.forEach(function (item, index) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
-                    });
                 }
 
                 function resizeTitleLabelUnwrap() {

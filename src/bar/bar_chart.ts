@@ -105,7 +105,6 @@
                 function configBarWidthAndLabel() {
                     var labels = d3.selectAll('.nv-bar text')[0],
                         chartBars = d3.selectAll('.nv-bar')[0],
-                        legendTitles = d3.selectAll('.legend-title')[0],
                         parentHeight = (<any>d3.select('.nvd3-svg')[0][0]).getBBox().height;
 
                     d3.select('.bar-chart').classed('visible', true);
@@ -128,12 +127,6 @@
                         d3.select(labels[index])
                             .attr('dy', barSize.height / 2)
                             .attr('x', 19);
-                    });
-
-                    legendTitles.forEach(function (item, index) {
-                        $timeout(function () {
-                            $(item).addClass('visible');
-                        }, 200 * index);
                     });
                 }
 
