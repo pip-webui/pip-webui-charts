@@ -57,6 +57,9 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
     '    </svg>\n' +
+    '    <div class="visual-scroll">\n' +
+    '        <div class="scrolled-block"></div>\n' +
+    '    </div>\n' +
     '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
     '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
     '    </md-button>\n' +
@@ -408,6 +411,22 @@ module.run(['$templateCache', function($templateCache) {
                     nv.utils.windowResize(chart.update);
                     return chart;
                 });
+                function updateScroll(domains, boundary) {
+                    var bDiff = boundary[1] - boundary[0], domDiff = domains[1] - domains[0], isEqual = (domains[1] - domains[0]) / bDiff === 1;
+                    $($element[0]).find('.visual-scroll')
+                        .css('opacity', function () {
+                        return isEqual ? 0 : 1;
+                    });
+                    if (isEqual)
+                        return;
+                    $($element[0]).find('.scrolled-block')
+                        .css('left', function () {
+                        return domains[0] / bDiff * 100 + '%';
+                    })
+                        .css('width', function () {
+                        return domDiff / bDiff * 100 + '%';
+                    });
+                }
                 function addZoom(options) {
                     // scaleExtent
                     var scaleExtent = 4;
@@ -472,6 +491,7 @@ module.run(['$templateCache', function($templateCache) {
                             xDomain(fixDomain(xScale.domain(), x_boundary, d3.event.scale, d3.event.translate));
                             redraw();
                         }
+                        updateScroll(xScale.domain(), x_boundary);
                     }
                     //
                     setZoom = function (which) {

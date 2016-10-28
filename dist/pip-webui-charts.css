@@ -95,7 +95,8 @@ pip-line-chart .visible-y-axis .nvd3 .nv-y .tick:not(.zero) line {
   opacity: 1;
 }
 pip-line-chart .minus-button,
-pip-line-chart .plus-button {
+pip-line-chart .plus-button,
+pip-line-chart .visual-scroll {
   display: none;
 }
 pip-line-chart.dynamic .line-chart {
@@ -126,6 +127,24 @@ pip-line-chart.dynamic .line-chart .minus-button {
 }
 pip-line-chart.dynamic .line-chart .plus-button {
   right: 20px;
+}
+pip-line-chart.dynamic .line-chart .visual-scroll {
+  transition: all 0.5s ease;
+  opacity: 0;
+  display: block;
+  position: relative;
+  height: 5px;
+  width: calc(100% - 50px);
+  margin-left: 30px;
+  background-color: rgba(0, 0, 0, 0.26);
+  border-radius: 2px;
+}
+pip-line-chart.dynamic .line-chart .visual-scroll .scrolled-block {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.26);
+  height: 5px;
+  transition: all 0.2s ease;
+  border-radius: 2px;
 }
 pip-line-chart.dynamic svg {
   cursor: move;

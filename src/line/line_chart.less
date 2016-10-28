@@ -63,7 +63,7 @@ pip-line-chart {
     }
   }
 
-  .minus-button, .plus-button {
+  .minus-button, .plus-button, .visual-scroll {
     display: none;
   }
 
@@ -92,6 +92,25 @@ pip-line-chart {
 
       .plus-button {
         right: 20px;
+      }
+
+      .visual-scroll {
+        transition: all 0.5s ease;
+        opacity: 0;
+        display: block;
+        position: relative;
+        height: 5px;
+        width: ~"calc(100% - 50px)";
+        margin-left: 30px;
+        background-color: rgba(0, 0, 0, 0.26);
+        border-radius: 2px;
+        .scrolled-block {
+          position: absolute;
+          background-color: rgba(0, 0, 0, 0.26);
+          height: 5px;
+          transition: all 0.2s ease;
+          border-radius: 2px;
+        }
       }
     }
 

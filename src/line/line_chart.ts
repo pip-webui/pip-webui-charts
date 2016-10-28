@@ -131,6 +131,27 @@
                     return chart;
                 });
 
+                function updateScroll(domains, boundary) {
+                    var bDiff = boundary[1] - boundary[0],
+                        domDiff = domains[1] - domains[0],
+                        isEqual = (domains[1] - domains[0])/bDiff === 1;
+
+                    $($element[0]).find('.visual-scroll')
+                        .css('opacity', function () {
+                            return isEqual ? 0 : 1;
+                        });
+
+                    if (isEqual) return;
+                    
+                    $($element[0]).find('.scrolled-block')
+                        .css('left', function () {
+                            return domains[0]/bDiff * 100 + '%';
+                        })
+                        .css('width', function () {
+                            return domDiff/bDiff * 100 + '%';
+                        });
+                }
+
                 function addZoom(options) {
                     // scaleExtent
                     var scaleExtent = 4;
@@ -201,6 +222,7 @@
                             xDomain(fixDomain(xScale.domain(), x_boundary, (<any>d3.event).scale, (<any>d3.event).translate));
                             redraw();
                         }
+                        updateScroll(xScale.domain(), x_boundary);
                     }
 
                     //

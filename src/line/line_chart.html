@@ -1,6 +1,9 @@
 <div class="line-chart" flex="auto" layout="column">
     <svg class="flex-auto" ng-class="{'visible-x-axis': lineChart.isVisibleX(), 'visible-y-axis': lineChart.isVisibleY()}">
     </svg>
+    <div class="visual-scroll">
+        <div class="scrolled-block"></div>
+    </div>
     <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">
         <md-icon md-svg-icon="icons:minus-circle"></md-icon>
     </md-button>
