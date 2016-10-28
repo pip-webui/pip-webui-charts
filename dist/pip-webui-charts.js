@@ -89,11 +89,6 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
-/**
- * @file Registration of chart WebUI controls
- * @copyright Digital Living Software Corp. 2014-2016
- */
-/* global angular */
 (function () {
     'use strict';
     angular.module('pipCharts', [
@@ -106,13 +101,6 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    /**
-     * @ngdoc module
-     * @name pipBarCharts
-     *
-     * @description
-     * Bar chart on top of Rickshaw charts
-     */
     angular.module('pipBarCharts', [])
         .directive('pipBarChart', pipBarChart);
     function pipBarChart() {
@@ -135,10 +123,7 @@ module.run(['$templateCache', function($templateCache) {
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                //colors = _.sample(colors, colors.length);
-                // sets legend params
                 vm.legend = vm.data[0].values;
-                // Sets colors of items
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -151,9 +136,6 @@ module.run(['$templateCache', function($templateCache) {
                         chart.update();
                     }
                 });
-                /**
-                 * Instantiate chart
-                 */
                 nv.addGraph(function () {
                     chart = nv.models.discreteBarChart()
                         .margin({ top: 10, right: 0, bottom: 0, left: -50 })
@@ -175,7 +157,6 @@ module.run(['$templateCache', function($templateCache) {
                         .datum(vm.data)
                         .style('height', 270)
                         .call(chart);
-                    //nv.utils.windowResize(chart.update);
                     return chart;
                 }, function () {
                     chart.dispatch.on('beforeUpdate', function () {
@@ -183,10 +164,6 @@ module.run(['$templateCache', function($templateCache) {
                     });
                     $timeout(configBarWidthAndLabel, 0);
                 });
-                /**
-                 * Aligns value label according to parent container size.
-                 * @return {void}
-                 */
                 function configBarWidthAndLabel() {
                     var labels = d3.selectAll('.nv-bar text')[0], chartBars = d3.selectAll('.nv-bar')[0], parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
                     d3.select('.bar-chart').classed('visible', true);
@@ -205,23 +182,12 @@ module.run(['$templateCache', function($templateCache) {
                             .attr('x', 19);
                     });
                 }
-                /**
-                 * Converts palette color name into RGBA color representation.
-                 * Should by replaced by palette for charts.
-                 *
-                 * @param {string} color    Name of color from AM palette
-                 * @returns {string} RGBa format
-                 */
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
                         + $mdColorPalette[color][500].value[1] + ','
                         + $mdColorPalette[color][500].value[2] + ','
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
-                /**
-                 * Helpful method
-                 * @private
-                 */
                 function generateParameterColor() {
                     vm.legend.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
@@ -234,13 +200,6 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    /**
-     * @ngdoc module
-     * @name pipLegends
-     *
-     * @description
-     * Legend of charts
-     */
     angular.module('pipChartLegends', [])
         .directive('pipChartLegend', pipChartLegend);
     function pipChartLegend() {
@@ -302,13 +261,6 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    /**
-     * @ngdoc module
-     * @name pipLineCharts
-     *
-     * @description
-     * Line chart on top of Rickshaw charts
-     */
     angular.module('pipLineCharts', [])
         .directive('pipLineChart', pipLineChart);
     function pipLineChart() {
@@ -352,7 +304,6 @@ module.run(['$templateCache', function($templateCache) {
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                // Sets colors of items
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -364,9 +315,6 @@ module.run(['$templateCache', function($templateCache) {
                         chartElem.datum(vm.data).call(chart);
                     }
                 }, true);
-                /**
-                 * Instantiate chart
-                 */
                 nv.addGraph(function () {
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 30 })
@@ -428,9 +376,7 @@ module.run(['$templateCache', function($templateCache) {
                     });
                 }
                 function addZoom(options) {
-                    // scaleExtent
                     var scaleExtent = 4;
-                    // parameters
                     var yAxis = options.yAxis;
                     var xAxis = options.xAxis;
                     var xDomain = options.xDomain || xAxis.scale().domain;
@@ -438,21 +384,16 @@ module.run(['$templateCache', function($templateCache) {
                     var redraw = options.redraw;
                     var svg = options.svg;
                     var discrete = options.discrete;
-                    // scales
                     var xScale = xAxis.scale();
                     var yScale = yAxis.scale();
-                    // min/max boundaries
                     var x_boundary = xAxis.scale().domain().slice();
                     var y_boundary = yAxis.scale().domain().slice();
-                    // create d3 zoom handler
                     var d3zoom = d3.behavior.zoom();
                     var prevXDomain = x_boundary;
                     var prevScale = d3zoom.scale();
                     var prevTranslate = d3zoom.translate();
-                    // ensure nice axis
                     xScale.nice();
                     yScale.nice();
-                    // fix domain
                     function fixDomain(domain, boundary, scale, translate) {
                         if (domain[0] < boundary[0]) {
                             domain[0] = boundary[0];
@@ -480,10 +421,7 @@ module.run(['$templateCache', function($templateCache) {
                         prevTranslate = _.clone(translate);
                         return domain;
                     }
-                    // zoom event handler
                     function zoomed() {
-                        // Switch off vertical zooming temporary
-                        // yDomain(yScale.domain());
                         if (d3.event.scale === 1) {
                             unzoomed();
                         }
@@ -493,7 +431,6 @@ module.run(['$templateCache', function($templateCache) {
                         }
                         updateScroll(xScale.domain(), x_boundary);
                     }
-                    //
                     setZoom = function (which) {
                         var center0 = [svg[0][0].getBBox().width / 2, svg[0][0].getBBox().height / 2];
                         var translate0 = d3zoom.translate(), coordinates0 = coordinates(center0);
@@ -517,7 +454,6 @@ module.run(['$templateCache', function($templateCache) {
                         var scale = d3zoom.scale(), translate = d3zoom.translate();
                         return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
                     }
-                    // zoom event handler
                     function unzoomed() {
                         xDomain(x_boundary);
                         yDomain(y_boundary);
@@ -527,32 +463,19 @@ module.run(['$templateCache', function($templateCache) {
                         prevScale = 1;
                         prevTranslate = [0, 0];
                     }
-                    // initialize wrapper
                     d3zoom.x(xScale)
                         .y(yScale)
                         .scaleExtent([1, scaleExtent])
                         .on('zoom', zoomed);
-                    // add handler
                     svg.call(d3zoom).on('dblclick.zoom', unzoomed);
                     $($element.get(0)).addClass('dynamic');
                 }
-                /**
-                 * Converts palette color name into RGBA color representation.
-                 * Should by replaced by palette for charts.
-                 *
-                 * @param {string} color    Name of color from AM palette
-                 * @returns {string} RGBa format
-                 */
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
                         + $mdColorPalette[color][500].value[1] + ','
                         + $mdColorPalette[color][500].value[2] + ','
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
-                /**
-                 * Helpful method
-                 * @private
-                 */
                 function generateParameterColor() {
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
@@ -565,13 +488,6 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
-    /**
-     * @ngdoc module
-     * @name pipPieCharts
-     *
-     * @description
-     * Line chart on top of Rickshaw charts
-     */
     angular.module('pipPieCharts', [])
         .directive('pipPieChart', pipPieChart);
     function pipPieChart() {
@@ -604,14 +520,10 @@ module.run(['$templateCache', function($templateCache) {
                         $timeout(resizeTitleLabel);
                     }
                 }, true);
-                // Sets colors of items
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
-                /**
-                 * Instantiate chart
-                 */
                 nv.addGraph(function () {
                     chart = nv.models.pieChart()
                         .margin({ top: 0, right: 0, bottom: 0, left: 0 })
@@ -674,23 +586,12 @@ module.run(['$templateCache', function($templateCache) {
                     }
                     titleElem.style('font-size', ~~boxSize.width / 2);
                 }
-                /**
-                 * Converts palette color name into RGBA color representation.
-                 * Should by replaced by palette for charts.
-                 *
-                 * @param {string} color    Name of color from AM palette
-                 * @returns {string} RGBa format
-                 */
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
                         + $mdColorPalette[color][500].value[1] + ','
                         + $mdColorPalette[color][500].value[2] + ','
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
-                /**
-                 * Helpful method
-                 * @private
-                 */
                 function generateParameterColor() {
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
