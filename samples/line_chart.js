@@ -6,7 +6,7 @@
     var thisModule = angular.module('appLineChart', ['pipServices']);
 
     thisModule.controller('LineChartController',
-        function ($scope) {
+        function ($scope, $interval) {
             $scope.showX = true;
             $scope.showY = true;
             
@@ -50,7 +50,13 @@
                     color: '#ef5350'
                 }
             ];
+
+            function nextStep() {
+                $scope.series.forEach(function (seria) {
+                    seria.values.push({value: Math.random() * 3000, x: seria.values.length * 100});
+                });
+            }
+
+            $interval(nextStep, 15000);
         })
-
-
 })();

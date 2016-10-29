@@ -15,7 +15,11 @@
         return {
             restrict: 'E',
             scope: {
-                series: '=pipSeries'
+                series: '=pipSeries',
+                donut: '=pipDonut',
+                legend: '=pipShowLegend',
+                total: '=pipShowTotal',
+                size: '=pipPieSize'
             },
             bindToController: true,
             controllerAs: 'pieChart',
@@ -31,6 +35,10 @@
                 var resizeTitleLabel = resizeTitleLabelUnwrap;
 
                 vm.data = vm.data || [];
+
+                vm.showLegend = function () {
+                    return vm.legend !== undefined ? vm.legend: true;
+                };
 
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
@@ -61,17 +69,17 @@
                     chart = nv.models.pieChart()
                         .margin({ top: 0, right: 0, bottom: 0, left: 0 })
                         .x(function (d) {
-                            return d.value;
+                            return vm.donut ? d.value : null;
                         })
                         .y(function (d) {
                             return d.value;
                         })
-                        .height(250)
-                        .width(250)
+                        .height(vm.size || 250)
+                        .width(vm.size || 250)
                         .showLabels(true)
                         .labelThreshold(.001)
                         .growOnHover(false)
-                        .donut(true)
+                        .donut(vm.donut)
                         .donutRatio(0.5)
                         .color(function(d) {
                             return d.color || (<any>d3.scale).paletteColors().range();
@@ -83,7 +91,8 @@
 
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
-                        .attr('height', 250)
+                        .attr('height', vm.size || 250)
+                        .attr('width', vm.size || 250)
                         .style('opacity', 0)
                         .datum(vm.data)
                         .call(chart);
@@ -95,15 +104,25 @@
 
                     return chart;
                 }, function () {
-                    $timeout(renderTotalLabel);
+                    $timeout(function () {
+                        var svgElem  = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                        renderTotalLabel(svgElem);
+                        d3.select(svgElem)
+                            .transition()
+                            .duration(1000)
+                            .style('opacity', 1);
+                        
+                        $timeout(resizeTitleLabelUnwrap, 800);
+                    });
                 });
 
-                function renderTotalLabel() {
-                    var svgElem  = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                function renderTotalLabel(svgElem) {
+                    if (!vm.total && !vm.donut) return;
+
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
                     }, 0);
-
+                    
                     d3.select(svgElem)
                         .select('.nv-pie:not(.nvd3)')
                         .append('text')
@@ -111,24 +130,21 @@
                         .attr('text-anchor', 'middle')
                         .style('dominant-baseline', 'central')
                         .text(totalVal);
-                    
-                    d3.select(svgElem)
-                        .transition()
-                        .duration(1000)
-                        .style('opacity', 1);
 
-                    titleElem = d3.select($element.find('text.label-total').get(0));
-                    resizeTitleLabel();
+                    titleElem = d3.select($element.find('text.label-total').get(0)).style('opacity', 0);
                 }
 
                 function resizeTitleLabelUnwrap() {
-                    var boxSize = $element.find('.nv-pieLabels').get(0).getBBox();
+                    if (!vm.total && !vm.donut) return;
+
+                    var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
+                        : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
 
                     if (!boxSize.width || !boxSize.height) {
                         return;
                     }
 
-                    titleElem.style('font-size', ~~boxSize.width / 2);
+                    titleElem.style('font-size', ~~boxSize.width / (vm.donut ? 2:2.5)).style('opacity', 1);
                 }
 
                 /**

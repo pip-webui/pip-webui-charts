@@ -1,12 +1,29 @@
 pip-pie-chart {
+  .pie-chart {
+    display: inline-block;
+  }
+
+  svg.nvd3-svg {
+    width: auto;
+  }
+
+  .circle {
+    .nvd3.nv-pie {
+      .label-total {
+        fill: white !important;
+      }
+    }
+  }
+
   .nvd3.nv-pie {
     path {
       fill-opacity: 1 !important;
     }
 
     .label-total {
+        transition: opacity 0.35s ease;
         font-family: Roboto;
-        font-size: 48px !important;
+        //font-size: 48px !important;
         font-weight: 500;
         font-style: normal;
         font-stretch: normal;

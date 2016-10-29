@@ -24,6 +24,19 @@
                     color: '#ef5350'
                 }
             ];
+
+            $scope.series2 = [
+                {
+                    label: 'Uncompleted',
+                    value: 15,
+                    color: '#fe9702'
+                },
+                {
+                    label: 'Failures',
+                    value: 5,
+                    color: '#ef5350'
+                }
+            ];
         })
 
 

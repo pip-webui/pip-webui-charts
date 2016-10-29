@@ -28,6 +28,7 @@
                 var chart     = null;
                 var chartElem = null;
                 var setZoom = null;
+                var updateZoomOptions = null;
                 var colors    = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
@@ -73,6 +74,8 @@
 
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
+
+                        if (updateZoomOptions) updateZoomOptions(vm.data);
                     }
                 }, true);
 
@@ -89,7 +92,7 @@
                             return d.value;
                         })
                         .height(270)
-                        .interactive(true)
+                        .useInteractiveGuideline(true)
                         .showXAxis(true)
                         .showYAxis(true)
                         .showLegend(false)
@@ -114,16 +117,7 @@
                     chartElem.datum(vm.data).style('height', 270).call(chart);
 
                     if (vm.dynamic) {
-                        addZoom({
-                            xAxis: chart.xAxis,
-                            yAxis: chart.yAxis,
-                            yDomain: chart.yDomain,
-                            xDomain: chart.xDomain,
-                            redraw: function () {
-                                chart.update();
-                            },
-                            svg: chartElem
-                        });
+                        addZoom(chart, chartElem);
                     }
 
                     nv.utils.windowResize(chart.update);
@@ -152,36 +146,61 @@
                         });
                 }
 
-                function addZoom(options) {
+                function addZoom(chart, svg) {
                     // scaleExtent
-                    var scaleExtent = 4;
+                    var scaleExtent = 4,
+                        savedYAxis = null,
+                        savedXAxis = null;
 
                     // parameters
-                    var yAxis       = options.yAxis;
-                    var xAxis       = options.xAxis;
-                    var xDomain     = options.xDomain || xAxis.scale().domain;
-                    var yDomain     = options.yDomain || yAxis.scale().domain;
-                    var redraw      = options.redraw;
-                    var svg         = options.svg;
-                    var discrete    = options.discrete;
+                    var yAxis       = null;
+                    var xAxis       = null;
+                    var xDomain     = null;
+                    var yDomain     = null;
+                    var redraw      = null;
+                    var svg         = svg;
 
                     // scales
-                    var xScale = xAxis.scale();
-                    var yScale = yAxis.scale();
+                    var xScale = null;
+                    var yScale = null;
 
                     // min/max boundaries
-                    var x_boundary = xAxis.scale().domain().slice();
-                    var y_boundary = yAxis.scale().domain().slice();
+                    var x_boundary = null;
+                    var y_boundary = null;
 
                     // create d3 zoom handler
                     var d3zoom = d3.behavior.zoom();
-                    var prevXDomain = x_boundary;
-                    var prevScale = d3zoom.scale();
-                    var prevTranslate = d3zoom.translate();
+                    var prevXDomain = null;
+                    var prevScale = null;
+                    var prevTranslate = null;
 
-                    // ensure nice axis
-                    xScale.nice();
-                    yScale.nice();
+                    setData(chart);
+
+                    function setData(newChart) {
+                        // parameters
+                        yAxis       = newChart.yAxis;
+                        xAxis       = newChart.xAxis;
+                        xDomain     = newChart.xDomain || xAxis.scale().domain;
+                        yDomain     = newChart.yDomain || yAxis.scale().domain;
+                        redraw      = newChart.update;
+
+                        // scales
+                        xScale = xAxis.scale();
+                        yScale = yAxis.scale();
+
+                        // min/max boundaries
+                        x_boundary = xAxis.scale().domain().slice();
+                        y_boundary = yAxis.scale().domain().slice();
+
+                        // create d3 zoom handler
+                        prevXDomain = x_boundary;
+                        prevScale = d3zoom.scale();
+                        prevTranslate = d3zoom.translate();
+
+                        // ensure nice axis
+                        xScale.nice();
+                        yScale.nice();
+                    }
 
                     // fix domain
                     function fixDomain(domain, boundary, scale, translate) {
@@ -212,16 +231,27 @@
                         return domain;
                     }
 
+                    function updateChart() {
+                        d3zoom.scale(1);
+                        d3zoom.translate([0,0]);
+                        xScale.domain(x_boundary);
+                        d3zoom.x(xScale).y(yScale);
+                        svg.call(d3zoom);
+                    }
+
                     // zoom event handler
                     function zoomed() {
                         // Switch off vertical zooming temporary
                         // yDomain(yScale.domain());
+
                         if ((<any>d3.event).scale === 1) {
                             unzoomed();
+                            updateChart();
                         } else {
                             xDomain(fixDomain(xScale.domain(), x_boundary, (<any>d3.event).scale, (<any>d3.event).translate));
                             redraw();
                         }
+
                         updateScroll(xScale.domain(), x_boundary);
                     }
 
@@ -277,7 +307,6 @@
                     // zoom event handler
                     function unzoomed() {
                         xDomain(x_boundary);
-                        yDomain(y_boundary);
                         redraw();
                         d3zoom.scale(1);
                         d3zoom.translate([0,0]);
@@ -296,12 +325,43 @@
                     $($element.get(0)).addClass('dynamic');
 
                     // add keyboard handlers
-
                     svg
                         .attr('focusable', false)
                         .style('outline', 'none')
                         .on('keydown', keypress)
                         .on('focus', function () {});
+
+                    var getXMinMax = function(data) {
+                        var maxVal, minVal = null;
+
+                        for(var i=0;i<data.length;i++) {
+                            if (!data[i].disabled) {
+                                var tempMinVal = d3.max(data[i].values, function(d) { return d.x;} );
+                                var tempMaxVal = d3.min(data[i].values, function(d) { return d.x;} );
+                                minVal = (!minVal || tempMinVal < minVal) ? tempMinVal : minVal;
+                                maxVal = (!maxVal || tempMaxVal > maxVal) ? tempMaxVal : maxVal;
+                            }
+                        }
+                        return [maxVal, minVal];
+                    };
+
+                    updateZoomOptions = function(data) {
+                        yAxis = chart.yAxis;
+                        xAxis = chart.xAxis;
+
+                        xScale = xAxis.scale();
+                        yScale = yAxis.scale();
+
+                        x_boundary = getXMinMax(data);
+
+                        if (d3zoom.scale() === 1) {
+                            d3zoom.x(xScale).y(yScale);
+                            svg.call(d3zoom);
+                            d3zoom.event(svg);
+                        }
+
+                        updateScroll(xScale.domain(), x_boundary);
+                    }
                 }
 
                 /**
