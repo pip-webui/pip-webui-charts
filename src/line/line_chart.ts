@@ -242,6 +242,19 @@
                         d3zoom.event(svg);
                     };
 
+                    function step(which) {
+                        var translate = d3zoom.translate();
+
+                        if (which === 'right') {
+                            translate[0] -= 20;
+                        } else {
+                            translate[0] += 20;
+                        }
+
+                        d3zoom.translate(translate);
+                        d3zoom.event(svg);
+                    }
+
                     function coordinates(point) {
                         var scale = d3zoom.scale(), translate = d3zoom.translate();
                         return [(point[0] - translate[0]) / scale, (point[1] - translate[1]) / scale];
@@ -250,6 +263,15 @@
                     function point(coordinates) {
                         var scale = d3zoom.scale(), translate = d3zoom.translate();
                         return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
+                    }
+
+                    function keypress() {
+                        switch((<any>d3.event).keyCode) {
+                            case 39: step('right'); break;
+                            case 37: step('left'); break;
+                            case 107: setZoom('in'); break;
+                            case 109: setZoom('out');
+                        }
                     }
 
                     // zoom event handler
@@ -272,6 +294,14 @@
                     // add handler
                     svg.call(d3zoom).on('dblclick.zoom', unzoomed);
                     $($element.get(0)).addClass('dynamic');
+
+                    // add keyboard handlers
+
+                    svg
+                        .attr('focusable', false)
+                        .style('outline', 'none')
+                        .on('keydown', keypress)
+                        .on('focus', function () {});
                 }
 
                 /**
