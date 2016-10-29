@@ -149,12 +149,21 @@ pip-line-chart.dynamic .line-chart .visual-scroll .scrolled-block {
 pip-line-chart.dynamic svg {
   cursor: move;
 }
+pip-pie-chart .pie-chart {
+  display: inline-block;
+}
+pip-pie-chart svg.nvd3-svg {
+  width: auto;
+}
+pip-pie-chart .circle .nvd3.nv-pie .label-total {
+  fill: white !important;
+}
 pip-pie-chart .nvd3.nv-pie path {
   fill-opacity: 1 !important;
 }
 pip-pie-chart .nvd3.nv-pie .label-total {
+  transition: opacity 0.35s ease;
   font-family: Roboto;
-  font-size: 48px !important;
   font-weight: 500;
   font-style: normal;
   font-stretch: normal;

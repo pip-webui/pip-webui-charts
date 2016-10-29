@@ -81,16 +81,19 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" flex="auto" layout="column">\n' +
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !pieChart.donut}">\n' +
     '    <svg class="flex-auto"></svg>\n' +
     '</div>\n' +
     '\n' +
-    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false"></pip-chart-legend>');
+    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 
-
-
+/**
+ * @file Registration of chart WebUI controls
+ * @copyright Digital Living Software Corp. 2014-2016
+ */
+/* global angular */
 (function () {
     'use strict';
     angular.module('pipCharts', [
@@ -103,6 +106,13 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    /**
+     * @ngdoc module
+     * @name pipBarCharts
+     *
+     * @description
+     * Bar chart on top of Rickshaw charts
+     */
     angular.module('pipBarCharts', [])
         .directive('pipBarChart', pipBarChart);
     function pipBarChart() {
@@ -125,7 +135,10 @@ module.run(['$templateCache', function($templateCache) {
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
+                //colors = _.sample(colors, colors.length);
+                // sets legend params
                 vm.legend = vm.data[0].values;
+                // Sets colors of items
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -138,6 +151,9 @@ module.run(['$templateCache', function($templateCache) {
                         chart.update();
                     }
                 });
+                /**
+                 * Instantiate chart
+                 */
                 nv.addGraph(function () {
                     chart = nv.models.discreteBarChart()
                         .margin({ top: 10, right: 0, bottom: 0, left: -50 })
@@ -159,6 +175,7 @@ module.run(['$templateCache', function($templateCache) {
                         .datum(vm.data)
                         .style('height', 270)
                         .call(chart);
+                    //nv.utils.windowResize(chart.update);
                     return chart;
                 }, function () {
                     chart.dispatch.on('beforeUpdate', function () {
@@ -166,6 +183,10 @@ module.run(['$templateCache', function($templateCache) {
                     });
                     $timeout(configBarWidthAndLabel, 0);
                 });
+                /**
+                 * Aligns value label according to parent container size.
+                 * @return {void}
+                 */
                 function configBarWidthAndLabel() {
                     var labels = d3.selectAll('.nv-bar text')[0], chartBars = d3.selectAll('.nv-bar')[0], parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
                     d3.select('.bar-chart').classed('visible', true);
@@ -184,12 +205,23 @@ module.run(['$templateCache', function($templateCache) {
                             .attr('x', 19);
                     });
                 }
+                /**
+                 * Converts palette color name into RGBA color representation.
+                 * Should by replaced by palette for charts.
+                 *
+                 * @param {string} color    Name of color from AM palette
+                 * @returns {string} RGBa format
+                 */
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
                         + $mdColorPalette[color][500].value[1] + ','
                         + $mdColorPalette[color][500].value[2] + ','
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
+                /**
+                 * Helpful method
+                 * @private
+                 */
                 function generateParameterColor() {
                     vm.legend.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
@@ -202,6 +234,13 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    /**
+     * @ngdoc module
+     * @name pipLegends
+     *
+     * @description
+     * Legend of charts
+     */
     angular.module('pipChartLegends', [])
         .directive('pipChartLegend', pipChartLegend);
     function pipChartLegend() {
@@ -263,6 +302,13 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    /**
+     * @ngdoc module
+     * @name pipLineCharts
+     *
+     * @description
+     * Line chart on top of Rickshaw charts
+     */
     angular.module('pipLineCharts', [])
         .directive('pipLineChart', pipLineChart);
     function pipLineChart() {
@@ -282,6 +328,7 @@ module.run(['$templateCache', function($templateCache) {
                 var chart = null;
                 var chartElem = null;
                 var setZoom = null;
+                var updateZoomOptions = null;
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
@@ -306,6 +353,7 @@ module.run(['$templateCache', function($templateCache) {
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
+                // Sets colors of items
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -315,8 +363,13 @@ module.run(['$templateCache', function($templateCache) {
                     generateParameterColor();
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
+                        if (updateZoomOptions)
+                            updateZoomOptions(vm.data);
                     }
                 }, true);
+                /**
+                 * Instantiate chart
+                 */
                 nv.addGraph(function () {
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 30 })
@@ -327,7 +380,7 @@ module.run(['$templateCache', function($templateCache) {
                         return d.value;
                     })
                         .height(270)
-                        .interactive(true)
+                        .useInteractiveGuideline(true)
                         .showXAxis(true)
                         .showYAxis(true)
                         .showLegend(false)
@@ -347,16 +400,7 @@ module.run(['$templateCache', function($templateCache) {
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
                     chartElem.datum(vm.data).style('height', 270).call(chart);
                     if (vm.dynamic) {
-                        addZoom({
-                            xAxis: chart.xAxis,
-                            yAxis: chart.yAxis,
-                            yDomain: chart.yDomain,
-                            xDomain: chart.xDomain,
-                            redraw: function () {
-                                chart.update();
-                            },
-                            svg: chartElem
-                        });
+                        addZoom(chart, chartElem);
                     }
                     nv.utils.windowResize(chart.update);
                     return chart;
@@ -377,25 +421,50 @@ module.run(['$templateCache', function($templateCache) {
                         return domDiff / bDiff * 100 + '%';
                     });
                 }
-                function addZoom(options) {
-                    var scaleExtent = 4;
-                    var yAxis = options.yAxis;
-                    var xAxis = options.xAxis;
-                    var xDomain = options.xDomain || xAxis.scale().domain;
-                    var yDomain = options.yDomain || yAxis.scale().domain;
-                    var redraw = options.redraw;
-                    var svg = options.svg;
-                    var discrete = options.discrete;
-                    var xScale = xAxis.scale();
-                    var yScale = yAxis.scale();
-                    var x_boundary = xAxis.scale().domain().slice();
-                    var y_boundary = yAxis.scale().domain().slice();
+                function addZoom(chart, svg) {
+                    // scaleExtent
+                    var scaleExtent = 4, savedYAxis = null, savedXAxis = null;
+                    // parameters
+                    var yAxis = null;
+                    var xAxis = null;
+                    var xDomain = null;
+                    var yDomain = null;
+                    var redraw = null;
+                    var svg = svg;
+                    // scales
+                    var xScale = null;
+                    var yScale = null;
+                    // min/max boundaries
+                    var x_boundary = null;
+                    var y_boundary = null;
+                    // create d3 zoom handler
                     var d3zoom = d3.behavior.zoom();
-                    var prevXDomain = x_boundary;
-                    var prevScale = d3zoom.scale();
-                    var prevTranslate = d3zoom.translate();
-                    xScale.nice();
-                    yScale.nice();
+                    var prevXDomain = null;
+                    var prevScale = null;
+                    var prevTranslate = null;
+                    setData(chart);
+                    function setData(newChart) {
+                        // parameters
+                        yAxis = newChart.yAxis;
+                        xAxis = newChart.xAxis;
+                        xDomain = newChart.xDomain || xAxis.scale().domain;
+                        yDomain = newChart.yDomain || yAxis.scale().domain;
+                        redraw = newChart.update;
+                        // scales
+                        xScale = xAxis.scale();
+                        yScale = yAxis.scale();
+                        // min/max boundaries
+                        x_boundary = xAxis.scale().domain().slice();
+                        y_boundary = yAxis.scale().domain().slice();
+                        // create d3 zoom handler
+                        prevXDomain = x_boundary;
+                        prevScale = d3zoom.scale();
+                        prevTranslate = d3zoom.translate();
+                        // ensure nice axis
+                        xScale.nice();
+                        yScale.nice();
+                    }
+                    // fix domain
                     function fixDomain(domain, boundary, scale, translate) {
                         if (domain[0] < boundary[0]) {
                             domain[0] = boundary[0];
@@ -423,9 +492,20 @@ module.run(['$templateCache', function($templateCache) {
                         prevTranslate = _.clone(translate);
                         return domain;
                     }
+                    function updateChart() {
+                        d3zoom.scale(1);
+                        d3zoom.translate([0, 0]);
+                        xScale.domain(x_boundary);
+                        d3zoom.x(xScale).y(yScale);
+                        svg.call(d3zoom);
+                    }
+                    // zoom event handler
                     function zoomed() {
+                        // Switch off vertical zooming temporary
+                        // yDomain(yScale.domain());
                         if (d3.event.scale === 1) {
                             unzoomed();
+                            updateChart();
                         }
                         else {
                             xDomain(fixDomain(xScale.domain(), x_boundary, d3.event.scale, d3.event.translate));
@@ -433,6 +513,7 @@ module.run(['$templateCache', function($templateCache) {
                         }
                         updateScroll(xScale.domain(), x_boundary);
                     }
+                    //
                     setZoom = function (which) {
                         var center0 = [svg[0][0].getBBox().width / 2, svg[0][0].getBBox().height / 2];
                         var translate0 = d3zoom.translate(), coordinates0 = coordinates(center0);
@@ -481,33 +562,72 @@ module.run(['$templateCache', function($templateCache) {
                             case 109: setZoom('out');
                         }
                     }
+                    // zoom event handler
                     function unzoomed() {
                         xDomain(x_boundary);
-                        yDomain(y_boundary);
                         redraw();
                         d3zoom.scale(1);
                         d3zoom.translate([0, 0]);
                         prevScale = 1;
                         prevTranslate = [0, 0];
                     }
+                    // initialize wrapper
                     d3zoom.x(xScale)
                         .y(yScale)
                         .scaleExtent([1, scaleExtent])
                         .on('zoom', zoomed);
+                    // add handler
                     svg.call(d3zoom).on('dblclick.zoom', unzoomed);
                     $($element.get(0)).addClass('dynamic');
+                    // add keyboard handlers
                     svg
                         .attr('focusable', false)
                         .style('outline', 'none')
                         .on('keydown', keypress)
                         .on('focus', function () { });
+                    var getXMinMax = function (data) {
+                        var maxVal, minVal = null;
+                        for (var i = 0; i < data.length; i++) {
+                            if (!data[i].disabled) {
+                                var tempMinVal = d3.max(data[i].values, function (d) { return d.x; });
+                                var tempMaxVal = d3.min(data[i].values, function (d) { return d.x; });
+                                minVal = (!minVal || tempMinVal < minVal) ? tempMinVal : minVal;
+                                maxVal = (!maxVal || tempMaxVal > maxVal) ? tempMaxVal : maxVal;
+                            }
+                        }
+                        return [maxVal, minVal];
+                    };
+                    updateZoomOptions = function (data) {
+                        yAxis = chart.yAxis;
+                        xAxis = chart.xAxis;
+                        xScale = xAxis.scale();
+                        yScale = yAxis.scale();
+                        x_boundary = getXMinMax(data);
+                        if (d3zoom.scale() === 1) {
+                            d3zoom.x(xScale).y(yScale);
+                            svg.call(d3zoom);
+                            d3zoom.event(svg);
+                        }
+                        updateScroll(xScale.domain(), x_boundary);
+                    };
                 }
+                /**
+                 * Converts palette color name into RGBA color representation.
+                 * Should by replaced by palette for charts.
+                 *
+                 * @param {string} color    Name of color from AM palette
+                 * @returns {string} RGBa format
+                 */
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
                         + $mdColorPalette[color][500].value[1] + ','
                         + $mdColorPalette[color][500].value[2] + ','
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
+                /**
+                 * Helpful method
+                 * @private
+                 */
                 function generateParameterColor() {
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
@@ -520,13 +640,24 @@ module.run(['$templateCache', function($templateCache) {
 
 (function () {
     'use strict';
+    /**
+     * @ngdoc module
+     * @name pipPieCharts
+     *
+     * @description
+     * Line chart on top of Rickshaw charts
+     */
     angular.module('pipPieCharts', [])
         .directive('pipPieChart', pipPieChart);
     function pipPieChart() {
         return {
             restrict: 'E',
             scope: {
-                series: '=pipSeries'
+                series: '=pipSeries',
+                donut: '=pipDonut',
+                legend: '=pipShowLegend',
+                total: '=pipShowTotal',
+                size: '=pipPieSize'
             },
             bindToController: true,
             controllerAs: 'pieChart',
@@ -541,6 +672,9 @@ module.run(['$templateCache', function($templateCache) {
                 });
                 var resizeTitleLabel = resizeTitleLabelUnwrap;
                 vm.data = vm.data || [];
+                vm.showLegend = function () {
+                    return vm.legend !== undefined ? vm.legend : true;
+                };
                 if (vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
@@ -552,25 +686,29 @@ module.run(['$templateCache', function($templateCache) {
                         $timeout(resizeTitleLabel);
                     }
                 }, true);
+                // Sets colors of items
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
+                /**
+                 * Instantiate chart
+                 */
                 nv.addGraph(function () {
                     chart = nv.models.pieChart()
                         .margin({ top: 0, right: 0, bottom: 0, left: 0 })
                         .x(function (d) {
-                        return d.value;
+                        return vm.donut ? d.value : null;
                     })
                         .y(function (d) {
                         return d.value;
                     })
-                        .height(250)
-                        .width(250)
+                        .height(vm.size || 250)
+                        .width(vm.size || 250)
                         .showLabels(true)
                         .labelThreshold(.001)
                         .growOnHover(false)
-                        .donut(true)
+                        .donut(vm.donut)
                         .donutRatio(0.5)
                         .color(function (d) {
                         return d.color || d3.scale.paletteColors().range();
@@ -580,7 +718,8 @@ module.run(['$templateCache', function($templateCache) {
                     chart.showLegend(false);
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
-                        .attr('height', 250)
+                        .attr('height', vm.size || 250)
+                        .attr('width', vm.size || 250)
                         .style('opacity', 0)
                         .datum(vm.data)
                         .call(chart);
@@ -590,10 +729,19 @@ module.run(['$templateCache', function($templateCache) {
                     });
                     return chart;
                 }, function () {
-                    $timeout(renderTotalLabel);
+                    $timeout(function () {
+                        var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                        renderTotalLabel(svgElem);
+                        d3.select(svgElem)
+                            .transition()
+                            .duration(1000)
+                            .style('opacity', 1);
+                        $timeout(resizeTitleLabelUnwrap, 800);
+                    });
                 });
-                function renderTotalLabel() {
-                    var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
+                function renderTotalLabel(svgElem) {
+                    if (!vm.total && !vm.donut)
+                        return;
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
                     }, 0);
@@ -604,26 +752,35 @@ module.run(['$templateCache', function($templateCache) {
                         .attr('text-anchor', 'middle')
                         .style('dominant-baseline', 'central')
                         .text(totalVal);
-                    d3.select(svgElem)
-                        .transition()
-                        .duration(1000)
-                        .style('opacity', 1);
-                    titleElem = d3.select($element.find('text.label-total').get(0));
-                    resizeTitleLabel();
+                    titleElem = d3.select($element.find('text.label-total').get(0)).style('opacity', 0);
                 }
                 function resizeTitleLabelUnwrap() {
-                    var boxSize = $element.find('.nv-pieLabels').get(0).getBBox();
+                    if (!vm.total && !vm.donut)
+                        return;
+                    var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
+                        : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
                     if (!boxSize.width || !boxSize.height) {
                         return;
                     }
-                    titleElem.style('font-size', ~~boxSize.width / 2);
+                    titleElem.style('font-size', ~~boxSize.width / (vm.donut ? 2 : 2.5)).style('opacity', 1);
                 }
+                /**
+                 * Converts palette color name into RGBA color representation.
+                 * Should by replaced by palette for charts.
+                 *
+                 * @param {string} color    Name of color from AM palette
+                 * @returns {string} RGBa format
+                 */
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
                         + $mdColorPalette[color][500].value[1] + ','
                         + $mdColorPalette[color][500].value[2] + ','
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
+                /**
+                 * Helpful method
+                 * @private
+                 */
                 function generateParameterColor() {
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
