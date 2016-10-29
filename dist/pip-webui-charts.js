@@ -89,6 +89,8 @@ module.run(['$templateCache', function($templateCache) {
 }]);
 })();
 
+
+
 (function () {
     'use strict';
     angular.module('pipCharts', [
@@ -446,6 +448,17 @@ module.run(['$templateCache', function($templateCache) {
                         d3zoom.translate([translate0[0] + center0[0] - center1[0], translate0[1] + center0[1] - center1[1]]);
                         d3zoom.event(svg);
                     };
+                    function step(which) {
+                        var translate = d3zoom.translate();
+                        if (which === 'right') {
+                            translate[0] -= 20;
+                        }
+                        else {
+                            translate[0] += 20;
+                        }
+                        d3zoom.translate(translate);
+                        d3zoom.event(svg);
+                    }
                     function coordinates(point) {
                         var scale = d3zoom.scale(), translate = d3zoom.translate();
                         return [(point[0] - translate[0]) / scale, (point[1] - translate[1]) / scale];
@@ -453,6 +466,20 @@ module.run(['$templateCache', function($templateCache) {
                     function point(coordinates) {
                         var scale = d3zoom.scale(), translate = d3zoom.translate();
                         return [coordinates[0] * scale + translate[0], coordinates[1] * scale + translate[1]];
+                    }
+                    function keypress() {
+                        switch (d3.event.keyCode) {
+                            case 39:
+                                step('right');
+                                break;
+                            case 37:
+                                step('left');
+                                break;
+                            case 107:
+                                setZoom('in');
+                                break;
+                            case 109: setZoom('out');
+                        }
                     }
                     function unzoomed() {
                         xDomain(x_boundary);
@@ -469,6 +496,11 @@ module.run(['$templateCache', function($templateCache) {
                         .on('zoom', zoomed);
                     svg.call(d3zoom).on('dblclick.zoom', unzoomed);
                     $($element.get(0)).addClass('dynamic');
+                    svg
+                        .attr('focusable', false)
+                        .style('outline', 'none')
+                        .on('keydown', keypress)
+                        .on('focus', function () { });
                 }
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
