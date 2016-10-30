@@ -3,5 +3,6 @@
 /build
 /temp
 /lib
+/obj
 npm-debug.log
 build.secret.js
