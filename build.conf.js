@@ -2,7 +2,7 @@ module.exports = {
     module: {
         name: 'pipCharts',
         styles: 'charts',
-        export: 'pip',
+        export: 'pip.charts',
         standalone: 'pip.charts'
     },
     build: {
