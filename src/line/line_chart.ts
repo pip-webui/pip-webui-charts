@@ -334,8 +334,8 @@
 
                         for(var i=0;i<data.length;i++) {
                             if (!data[i].disabled) {
-                                var tempMinVal = d3.max(data[i].values, function(d) { return d.x;} );
-                                var tempMaxVal = d3.min(data[i].values, function(d) { return d.x;} );
+                                var tempMinVal = d3.max(data[i].values, function(d: any) { return d.x;} );
+                                var tempMaxVal = d3.min(data[i].values, function(d: any) { return d.x;} );
                                 minVal = (!minVal || tempMinVal < minVal) ? tempMinVal : minVal;
                                 maxVal = (!maxVal || tempMaxVal > maxVal) ? tempMaxVal : maxVal;
                             }
