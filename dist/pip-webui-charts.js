@@ -423,7 +423,7 @@ module.run(['$templateCache', function($templateCache) {
                 }
                 function addZoom(chart, svg) {
                     // scaleExtent
-                    var scaleExtent = 4, savedYAxis = null, savedXAxis = null;
+                    var scaleExtent = 4;
                     // parameters
                     var yAxis = null;
                     var xAxis = null;
