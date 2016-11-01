@@ -620,6 +620,33 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column">\n' +
+    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
+    '    </svg>\n' +
+    '    <div class="visual-scroll">\n' +
+    '        <div class="scrolled-block"></div>\n' +
+    '    </div>\n' +
+    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
+    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
+    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
+    '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('legend/interactive_legend.html',
     '<div >\n' +
     '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
@@ -642,33 +669,6 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column">\n' +
-    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
-    '    </svg>\n' +
-    '    <div class="visual-scroll">\n' +
-    '        <div class="scrolled-block"></div>\n' +
-    '    </div>\n' +
-    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
-    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
-    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
-    '');
 }]);
 })();
 
