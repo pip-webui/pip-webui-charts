@@ -280,13 +280,7 @@
                     });
                 }
                 function addZoom(chart, svg) {
-<<<<<<< HEAD
-                    // scaleExtent
                     var scaleExtent = 4;
-                    // parameters
-=======
-                    var scaleExtent = 4;
->>>>>>> 5321655c207991e9345e6d5e4fc2f13dbc7b4f79
                     var yAxis = null;
                     var xAxis = null;
                     var xDomain = null;
