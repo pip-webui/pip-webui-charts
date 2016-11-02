@@ -605,11 +605,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart flex-auto layout-column">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+    '<div class="bar-chart flex-auto layout-column"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
 
@@ -621,27 +617,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('legend/interactive_legend.html',
-    '<div >\n' +
-    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
-    '        <md-checkbox class="lp16 m8"\n' +
-    '                     ng-model="item.disabled"\n' +
-    '                     ng-true-value="false"\n' +
-    '                     ng-false-value="true"\n' +
-    '                     ng-if="interactive"\n' +
-    '                     aria-label="{{ item.label }}">\n' +
-    '            <p class="legend-item-value"\n' +
-    '               ng-style="{\'background-color\': item.color}">\n' +
-    '                {{ item.value }}\n' +
-    '            </p>\n' +
-    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
-    '        </md-checkbox>\n' +
-    '\n' +
-    '        <div ng-if="!interactive">\n' +
-    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '            <span>{{:: item.label || item.key}}</span>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
+    '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
 }]);
 })();
 
@@ -653,22 +629,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column">\n' +
-    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
-    '    </svg>\n' +
-    '    <div class="visual-scroll">\n' +
-    '        <div class="scrolled-block"></div>\n' +
-    '    </div>\n' +
-    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
-    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
-    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
-    '');
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="visual-scroll"><div class="scrolled-block"></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
 
@@ -680,11 +641,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !pieChart.donut}">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 
