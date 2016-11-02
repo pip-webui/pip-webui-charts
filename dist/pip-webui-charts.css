@@ -148,6 +148,11 @@ pip-line-chart.dynamic .line-chart .visual-scroll .scrolled-block {
 }
 pip-line-chart.dynamic svg {
   cursor: move;
+  transition: background 0.5s;
+}
+pip-line-chart.dynamic svg:focus,
+pip-line-chart.dynamic svg:hover {
+  background-color: rgba(0, 0, 0, 0.06);
 }
 pip-pie-chart .pie-chart {
   display: inline-block;
