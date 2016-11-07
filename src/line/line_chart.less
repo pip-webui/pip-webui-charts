@@ -22,6 +22,16 @@ pip-line-chart {
       }
     }
 
+    .nvd3.nv-line .nvd3.nv-scatter .nv-groups .nv-point {
+        fill-opacity: 0 !important;
+        stroke-opacity: 0 !important;
+    }
+
+    line.nv-guideline {
+        stroke: #626262;
+        stroke-width: 2;
+    }
+
     .nv-x {
       .tick:not(.zero) {
         line {
@@ -123,3 +133,5 @@ pip-line-chart {
     }
   }
 }
+
+//nv-interactiveGuideLine

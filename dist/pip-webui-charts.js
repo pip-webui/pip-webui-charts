@@ -51,7 +51,7 @@
                         return d.color || d3.scale.paletteColors().range();
                     });
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
                         .datum(vm.data)
@@ -142,6 +142,8 @@
                     });
                 }
                 function prepareSeries() {
+                    if (!$scope.series)
+                        return;
                     $scope.series.forEach(function (item, index) {
                         item.color = item.color || colors[index];
                         item.disabled = item.disabled || false;
@@ -246,7 +248,7 @@
                         return d.color || d3.scale.paletteColors().range();
                     });
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
                     chart.yAxis
                         .tickFormat(function (d) {
                         return d / 1000 + 'k';
@@ -496,7 +498,7 @@
                 vm.showLegend = function () {
                     return vm.legend !== undefined ? vm.legend : true;
                 };
-                if (vm.series.length > colors.length) {
+                if (vm.series && vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
                 $scope.$watch('pieChart.series', function (newVal) {
@@ -531,14 +533,14 @@
                         return d.color || d3.scale.paletteColors().range();
                     });
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
                     chart.showLegend(false);
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
                         .attr('height', vm.size || 250)
                         .attr('width', vm.size || 250)
                         .style('opacity', 0)
-                        .datum(vm.data)
+                        .datum(vm.data || [])
                         .call(chart);
                     nv.utils.windowResize(function () {
                         chart.update();
@@ -554,10 +556,29 @@
                             .duration(1000)
                             .style('opacity', 1);
                         $timeout(resizeTitleLabelUnwrap, 800);
+                        drawEmptyState(svgElem);
                     });
                 });
+                function drawEmptyState(svg) {
+                    if (!$element.find('text.nv-noData').get(0))
+                        return;
+                    $element.find('.pie-chart')
+                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                    var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
+                    var arc = d3.svg.arc()
+                        .innerRadius(size / 2 - 20)
+                        .outerRadius(size / 2 - 57);
+                    svg = d3.select(svg)
+                        .append("g")
+                        .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                    var path = svg.selectAll("path")
+                        .data(pie([1]))
+                        .enter().append("path")
+                        .attr("fill", "rgba(0, 0, 0, 0.08)")
+                        .attr("d", arc);
+                }
                 function renderTotalLabel(svgElem) {
-                    if (!vm.total && !vm.donut)
+                    if ((!vm.total && !vm.donut) || !vm.data)
                         return;
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
@@ -572,7 +593,7 @@
                     titleElem = d3.select($element.find('text.label-total').get(0)).style('opacity', 0);
                 }
                 function resizeTitleLabelUnwrap() {
-                    if (!vm.total && !vm.donut)
+                    if ((!vm.total && !vm.donut) || !vm.data)
                         return;
                     var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
                         : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
@@ -588,6 +609,8 @@
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
                 function generateParameterColor() {
+                    if (!vm.data)
+                        return;
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
@@ -605,7 +628,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart flex-auto layout-column"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+    '<div class="bar-chart flex-auto layout-column">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
 
@@ -617,7 +644,27 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('legend/interactive_legend.html',
-    '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
+    '<div >\n' +
+    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
+    '        <md-checkbox class="lp16 m8"\n' +
+    '                     ng-model="item.disabled"\n' +
+    '                     ng-true-value="false"\n' +
+    '                     ng-false-value="true"\n' +
+    '                     ng-if="interactive"\n' +
+    '                     aria-label="{{ item.label }}">\n' +
+    '            <p class="legend-item-value"\n' +
+    '               ng-style="{\'background-color\': item.color}">\n' +
+    '                {{ item.value }}\n' +
+    '            </p>\n' +
+    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
+    '        </md-checkbox>\n' +
+    '\n' +
+    '        <div ng-if="!interactive">\n' +
+    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
+    '            <span>{{:: item.label || item.key}}</span>\n' +
+    '        </div>\n' +
+    '    </div>\n' +
+    '</div>');
 }]);
 })();
 
@@ -629,7 +676,22 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="visual-scroll"><div class="scrolled-block"></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>');
+    '<div class="line-chart" flex="auto" layout="column">\n' +
+    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
+    '    </svg>\n' +
+    '    <div class="visual-scroll">\n' +
+    '        <div class="scrolled-block"></div>\n' +
+    '    </div>\n' +
+    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
+    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
+    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
+    '    </md-button>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
+    '');
 }]);
 })();
 
@@ -641,7 +703,11 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !pieChart.donut}">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 

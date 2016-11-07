@@ -40,7 +40,7 @@
                     return vm.legend !== undefined ? vm.legend: true;
                 };
 
-                if (vm.series.length > colors.length) {
+                if (vm.series && vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
 
@@ -65,7 +65,7 @@
                 /**
                  * Instantiate chart
                  */
-                nv.addGraph(function () {
+                nv.addGraph(() => {
                     chart = nv.models.pieChart()
                         .margin({ top: 0, right: 0, bottom: 0, left: 0 })
                         .x(function (d) {
@@ -86,7 +86,7 @@
                         });
 
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
                     chart.showLegend(false);
 
                     chartElem = d3.select($element.get(0))
@@ -94,7 +94,7 @@
                         .attr('height', vm.size || 250)
                         .attr('width', vm.size || 250)
                         .style('opacity', 0)
-                        .datum(vm.data)
+                        .datum(vm.data || [])
                         .call(chart);
 
                     nv.utils.windowResize(function () {
@@ -103,7 +103,7 @@
                     });
 
                     return chart;
-                }, function () {
+                }, () => {
                     $timeout(function () {
                         var svgElem  = d3.select($element.get(0)).select('.pie-chart svg')[0][0];
                         renderTotalLabel(svgElem);
@@ -113,11 +113,36 @@
                             .style('opacity', 1);
                         
                         $timeout(resizeTitleLabelUnwrap, 800);
+                        drawEmptyState(svgElem);
                     });
                 });
 
+                function drawEmptyState(svg) {
+                    if (!$element.find('text.nv-noData').get(0)) return;
+                    
+                    $element.find('.pie-chart')
+                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+
+                    var pie = d3.layout.pie().sort(null),
+                        size = Number(vm.size || 250);
+
+                    var arc = d3.svg.arc()
+                        .innerRadius(size / 2 - 20)
+                        .outerRadius(size / 2 - 57);
+                    
+                    svg = d3.select(svg)
+                        .append("g")
+                        .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                    
+                    var path = svg.selectAll("path")
+                        .data(pie([1]))
+                        .enter().append("path")
+                        .attr("fill", "rgba(0, 0, 0, 0.08)")
+                        .attr("d", <any>arc);
+                }
+
                 function renderTotalLabel(svgElem) {
-                    if (!vm.total && !vm.donut) return;
+                    if ((!vm.total && !vm.donut) || !vm.data) return;
 
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
@@ -135,7 +160,7 @@
                 }
 
                 function resizeTitleLabelUnwrap() {
-                    if (!vm.total && !vm.donut) return;
+                    if ((!vm.total && !vm.donut) || !vm.data) return;
 
                     var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
                         : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
@@ -167,6 +192,8 @@
                  * @private
                  */
                 function generateParameterColor() {
+                    if (!vm.data) return;
+
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });

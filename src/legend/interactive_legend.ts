@@ -46,6 +46,8 @@
                 }
                 
                 function prepareSeries() {
+                    if (!$scope.series) return;
+
                     $scope.series.forEach(function (item, index) {
                         item.color = item.color || colors[index];
                         item.disabled = item.disabled || false;

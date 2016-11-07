@@ -101,7 +101,7 @@
                         });
 
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
 
                     chart.yAxis
                         .tickFormat(function (d) {

@@ -79,7 +79,7 @@
                         });
 
                     chart.tooltip.enabled(false);
-                    chart.noData('No data for this moment...');
+                    chart.noData('There is no data right now...');
 
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
