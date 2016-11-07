@@ -56,7 +56,7 @@
                     }
                 };
                 
-                if (vm.series.length > colors.length) {
+                if (vm.series && vm.series.length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
 
@@ -73,7 +73,7 @@
                     generateParameterColor();
 
                     if (chart) {
-                        chartElem.datum(vm.data).call(chart);
+                        chartElem.datum(vm.data || []).call(chart);
 
                         if (updateZoomOptions) updateZoomOptions(vm.data);
                     }
@@ -82,7 +82,7 @@
                 /**
                  * Instantiate chart
                  */
-                nv.addGraph(function () {
+                nv.addGraph(() => {
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 30 })
                         .x(function (d) {
@@ -114,7 +114,7 @@
                         });
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
-                    chartElem.datum(vm.data).style('height', 270).call(chart);
+                    chartElem.datum(vm.data || []).style('height', 270).call(chart);
 
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
@@ -123,7 +123,34 @@
                     nv.utils.windowResize(chart.update);
 
                     return chart;
+                }, () => {
+                    drawEmptyState();
                 });
+
+                function drawEmptyState() {
+                    if (!$element.find('text.nv-noData').get(0)) return;
+
+                    chartElem
+                        .append("defs")
+                        .append("pattern")
+                        .attr("height", 1)
+                        .attr("width", 1)
+                        .attr("x", "0")
+                        .attr("y", "0")
+                        .attr("id", "bg")
+                        .append("image")
+                        .attr('x', 27)
+                        .attr('y', 0)
+                        .attr('height', "100%")
+                        .attr('width', 1151)
+                        .attr("xlink:href", "images/line_chart_empty_state.svg");
+
+                    chartElem
+                        .append('rect')
+                        .attr('height', "100%")
+                        .attr('width', "100%")
+                        .attr('fill', 'url(#bg)');
+                }
 
                 function updateScroll(domains, boundary) {
                     var bDiff = boundary[1] - boundary[0],
@@ -381,6 +408,8 @@
                  * @private
                  */
                 function generateParameterColor() {
+                    if (!vm.data) return;
+
                     vm.data.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });

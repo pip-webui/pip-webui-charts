@@ -96,6 +96,12 @@ pip-line-chart .nvd3 .nv-x .tick:not(.zero) line {
 pip-line-chart .nvd3 .nv-y .tick:not(.zero) line {
   opacity: 0;
 }
+pip-line-chart .nvd3.nv-noData {
+  font-size: 14px;
+  font-family: Roboto;
+  fill: rgba(0, 0, 0, 0.54);
+  font-weight: normal;
+}
 pip-line-chart .visible-x-axis .nvd3 .nv-x .tick:not(.zero) line {
   opacity: 1;
 }
