@@ -52,6 +52,7 @@
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         $timeout(resizeTitleLabel);
+                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     }
                 }, true);
 
@@ -100,6 +101,7 @@
                     nv.utils.windowResize(function () {
                         chart.update();
                         $timeout(resizeTitleLabel);
+                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     });
 
                     return chart;
@@ -118,27 +120,34 @@
                 });
 
                 function drawEmptyState(svg) {
-                    if (!$element.find('text.nv-noData').get(0)) return;
+                    if (!$element.find('text.nv-noData').get(0)) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                        $element.find('.pip-empty-pie-text').remove();
+                    } else {
                     
-                    $element.find('.pie-chart')
-                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                        if ($element.find('.pip-empty-pie-text').length === 0) { 
+                            $element.find('.pie-chart')
+                                .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                        }
 
-                    var pie = d3.layout.pie().sort(null),
-                        size = Number(vm.size || 250);
+                        var pie = d3.layout.pie().sort(null),
+                            size = Number(vm.size || 250);
 
-                    var arc = d3.svg.arc()
-                        .innerRadius(size / 2 - 20)
-                        .outerRadius(size / 2 - 57);
+                        var arc = d3.svg.arc()
+                            .innerRadius(size / 2 - 20)
+                            .outerRadius(size / 2 - 57);
                     
-                    svg = d3.select(svg)
-                        .append("g")
-                        .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                        svg = d3.select(svg)
+                            .append("g")
+                            .classed('empty-state', true)
+                            .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
                     
-                    var path = svg.selectAll("path")
-                        .data(pie([1]))
-                        .enter().append("path")
-                        .attr("fill", "rgba(0, 0, 0, 0.08)")
-                        .attr("d", <any>arc);
+                        var path = svg.selectAll("path")
+                            .data(pie([1]))
+                            .enter().append("path")
+                            .attr("fill", "rgba(0, 0, 0, 0.08)")
+                            .attr("d", <any>arc);
+                    }
                 }
 
                 function renderTotalLabel(svgElem) {

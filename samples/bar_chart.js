@@ -15,6 +15,18 @@
                     {value: 250, label: 'Failures', color: '#ef5350'}
                 ]
             }];
+
+            $scope.setOrUnset = "Set";
+
+            $scope.setSecSeries = function() {
+                if (!$scope.series2) {
+                    $scope.series2 = $scope.series;
+                    $scope.setOrUnset = "Unset";
+                } else {
+                    $scope.series2 = undefined;
+                    $scope.setOrUnset = "Set";
+                }
+            }
         }
     )
 

@@ -7,6 +7,7 @@
                      ng-if="interactive"
                      aria-label="{{ item.label }}">
             <p class="legend-item-value"
+                ng-if="item.value"
                ng-style="{'background-color': item.color}">
                 {{ item.value }}
             </p>

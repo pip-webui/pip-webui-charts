@@ -23,7 +23,7 @@
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                vm.legend = vm.data[0].values;
+                vm.legend = vm.data[0] ? vm.data[0].values : [];
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -34,6 +34,10 @@
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         chart.update();
+                        drawEmptyState();
+                        $timeout(function () {
+                            vm.legend = vm.data[0] ? vm.data[0].values : [];
+                        });
                     }
                 });
                 nv.addGraph(function () {
@@ -63,11 +67,38 @@
                         $timeout(configBarWidthAndLabel, 0);
                     });
                     $timeout(configBarWidthAndLabel, 0);
+                    drawEmptyState();
                 });
+                function drawEmptyState() {
+                    if ($element.find('.nv-noData').length === 0) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                    }
+                    else {
+                        $element.find('.nv-noData').attr('x', 100);
+                        var g = chartElem.append('g').classed('empty-state', true);
+                        g.append('g')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 260)
+                            .attr('width', 38);
+                        g.append('g')
+                            .attr('transform', 'translate(46, 60)')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 200)
+                            .attr('width', 38);
+                        g.append('g')
+                            .attr('transform', 'translate(92, 160)')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 100)
+                            .attr('width', 38);
+                    }
+                }
                 function configBarWidthAndLabel() {
-                    var labels = d3.selectAll('.nv-bar text')[0], chartBars = d3.selectAll('.nv-bar')[0], parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
-                    d3.select('.bar-chart').classed('visible', true);
-                    chartBars.forEach(function (item, index) {
+                    var labels = $element.find('.nv-bar text'), chartBars = $element.find('.nv-bar'), parentHeight = $element.find('.nvd3-svg')[0].getBBox().height;
+                    d3.select($element.find('.bar-chart')[0]).classed('visible', true);
+                    chartBars.each(function (index, item) {
                         var barSize = item.getBBox(), element = d3.select(item), y = d3.transform(element.attr('transform')).translate[1];
                         element
                             .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
@@ -89,7 +120,9 @@
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
                 function generateParameterColor() {
-                    vm.legend.forEach(function (item, index) {
+                    if (!vm.data[0] || !vm.data)
+                        return;
+                    vm.data[0].values.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
@@ -182,7 +215,8 @@
                 series: '=pipSeries',
                 showYAxis: '=pipYAxis',
                 showXAxis: '=pipXAxis',
-                dynamic: '=pipDynamic'
+                dynamic: '=pipDynamic',
+                interactiveLegend: '=pipInterLegend'
             },
             bindToController: true,
             controllerAs: 'lineChart',
@@ -196,7 +230,8 @@
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
-                vm.data = vm.series || [];
+                vm.data = prepareData(vm.series) || [];
+                vm.legend = _.clone(vm.series);
                 vm.sourceEvents = [];
                 vm.isVisibleX = function () {
                     return vm.showXAxis == undefined ? true : vm.showXAxis;
@@ -222,14 +257,34 @@
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
                 $scope.$watch('lineChart.series', function (updatedSeries) {
-                    vm.data = updatedSeries;
+                    vm.data = prepareData(updatedSeries);
+                    vm.legend = _.clone(vm.series);
                     generateParameterColor();
                     if (chart) {
                         chartElem.datum(vm.data || []).call(chart);
+                        drawEmptyState();
                         if (updateZoomOptions)
                             updateZoomOptions(vm.data);
                     }
                 }, true);
+                $scope.$watch('lineChart.legend', function (updatedLegend) {
+                    vm.data = prepareData(updatedLegend);
+                    vm.legend = updatedLegend;
+                    if (chart) {
+                        chartElem.datum(vm.data || []).call(chart);
+                        drawEmptyState();
+                        if (updateZoomOptions)
+                            updateZoomOptions(vm.data);
+                    }
+                }, true);
+                function prepareData(data) {
+                    var result = [];
+                    _.each(data, function (seria) {
+                        if (!seria.disabled)
+                            result.push(seria);
+                    });
+                    return _.cloneDeep(result);
+                }
                 nv.addGraph(function () {
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 30 })
@@ -268,27 +323,31 @@
                     drawEmptyState();
                 });
                 function drawEmptyState() {
-                    if (!$element.find('text.nv-noData').get(0))
-                        return;
-                    chartElem
-                        .append("defs")
-                        .append("pattern")
-                        .attr("height", 1)
-                        .attr("width", 1)
-                        .attr("x", "0")
-                        .attr("y", "0")
-                        .attr("id", "bg")
-                        .append("image")
-                        .attr('x', 27)
-                        .attr('y', 0)
-                        .attr('height', "100%")
-                        .attr('width', 1151)
-                        .attr("xlink:href", "images/line_chart_empty_state.svg");
-                    chartElem
-                        .append('rect')
-                        .attr('height', "100%")
-                        .attr('width', "100%")
-                        .attr('fill', 'url(#bg)');
+                    if (!$element.find('text.nv-noData').get(0)) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                    }
+                    else {
+                        chartElem
+                            .append("defs")
+                            .append("pattern")
+                            .attr("height", 1)
+                            .attr("width", 1)
+                            .attr("x", "0")
+                            .attr("y", "0")
+                            .attr("id", "bg")
+                            .append("image")
+                            .attr('x', 27)
+                            .attr('y', 0)
+                            .attr('height', "100%")
+                            .attr('width', 1151)
+                            .attr("xlink:href", "images/line_chart_empty_state.svg");
+                        chartElem
+                            .append('rect')
+                            .classed('empty-state', true)
+                            .attr('height', "100%")
+                            .attr('width', "100%")
+                            .attr('fill', 'url(#bg)');
+                    }
                 }
                 function updateScroll(domains, boundary) {
                     var bDiff = boundary[1] - boundary[0], domDiff = domains[1] - domains[0], isEqual = (domains[1] - domains[0]) / bDiff === 1;
@@ -534,6 +593,7 @@
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         $timeout(resizeTitleLabel);
+                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     }
                 }, true);
                 generateParameterColor();
@@ -572,6 +632,7 @@
                     nv.utils.windowResize(function () {
                         chart.update();
                         $timeout(resizeTitleLabel);
+                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     });
                     return chart;
                 }, function () {
@@ -587,22 +648,29 @@
                     });
                 });
                 function drawEmptyState(svg) {
-                    if (!$element.find('text.nv-noData').get(0))
-                        return;
-                    $element.find('.pie-chart')
-                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
-                    var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
-                    var arc = d3.svg.arc()
-                        .innerRadius(size / 2 - 20)
-                        .outerRadius(size / 2 - 57);
-                    svg = d3.select(svg)
-                        .append("g")
-                        .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
-                    var path = svg.selectAll("path")
-                        .data(pie([1]))
-                        .enter().append("path")
-                        .attr("fill", "rgba(0, 0, 0, 0.08)")
-                        .attr("d", arc);
+                    if (!$element.find('text.nv-noData').get(0)) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                        $element.find('.pip-empty-pie-text').remove();
+                    }
+                    else {
+                        if ($element.find('.pip-empty-pie-text').length === 0) {
+                            $element.find('.pie-chart')
+                                .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                        }
+                        var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
+                        var arc = d3.svg.arc()
+                            .innerRadius(size / 2 - 20)
+                            .outerRadius(size / 2 - 57);
+                        svg = d3.select(svg)
+                            .append("g")
+                            .classed('empty-state', true)
+                            .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                        var path = svg.selectAll("path")
+                            .data(pie([1]))
+                            .enter().append("path")
+                            .attr("fill", "rgba(0, 0, 0, 0.08)")
+                            .attr("d", arc);
+                    }
                 }
                 function renderTotalLabel(svgElem) {
                     if ((!vm.total && !vm.donut) || !vm.data)
@@ -655,8 +723,8 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart flex-auto layout-column">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
+    '<div class="bar-chart">\n' +
+    '    <svg ></svg>\n' +
     '</div>\n' +
     '\n' +
     '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
@@ -680,6 +748,7 @@ module.run(['$templateCache', function($templateCache) {
     '                     ng-if="interactive"\n' +
     '                     aria-label="{{ item.label }}">\n' +
     '            <p class="legend-item-value"\n' +
+    '                ng-if="item.value"\n' +
     '               ng-style="{\'background-color\': item.color}">\n' +
     '                {{ item.value }}\n' +
     '            </p>\n' +
@@ -706,8 +775,10 @@ module.run(['$templateCache', function($templateCache) {
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
     '    </svg>\n' +
-    '    <div class="visual-scroll">\n' +
-    '        <div class="scrolled-block"></div>\n' +
+    '    <div class="scroll-container">\n' +
+    '        <div class="visual-scroll">\n' +
+    '            <div class="scrolled-block"></div>\n' +
+    '        </div>\n' +
     '    </div>\n' +
     '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
     '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
@@ -717,7 +788,7 @@ module.run(['$templateCache', function($templateCache) {
     '    </md-button>\n' +
     '</div>\n' +
     '\n' +
-    '<pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>\n' +
+    '<pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>\n' +
     '');
 }]);
 })();

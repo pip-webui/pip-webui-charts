@@ -18,7 +18,8 @@
                 series: '=pipSeries',
                 showYAxis: '=pipYAxis',
                 showXAxis: '=pipXAxis',
-                dynamic: '=pipDynamic'
+                dynamic: '=pipDynamic',
+                interactiveLegend: '=pipInterLegend'
             },
             bindToController: true,
             controllerAs: 'lineChart',
@@ -33,7 +34,8 @@
                     return color;
                 });
 
-                vm.data = vm.series || [];
+                vm.data = prepareData(vm.series) || [];
+                vm.legend = _.clone(vm.series);
                 vm.sourceEvents = [];
                 
                 vm.isVisibleX = function () {
@@ -68,16 +70,39 @@
                 };
 
                 $scope.$watch('lineChart.series', function (updatedSeries) {
-                    vm.data = updatedSeries;
+                    vm.data = prepareData(updatedSeries);
+                    vm.legend = _.clone(vm.series);
 
                     generateParameterColor();
 
                     if (chart) {
                         chartElem.datum(vm.data || []).call(chart);
+                        drawEmptyState();
 
                         if (updateZoomOptions) updateZoomOptions(vm.data);
                     }
                 }, true);
+
+                $scope.$watch('lineChart.legend', function(updatedLegend) {
+                    vm.data = prepareData(updatedLegend);
+                    vm.legend = updatedLegend;
+
+                    if (chart) {
+                        chartElem.datum(vm.data || []).call(chart);
+                        drawEmptyState();
+
+                        if (updateZoomOptions) updateZoomOptions(vm.data);
+                    }
+                }, true);
+
+                function prepareData(data) {
+                    let result = [];
+                    _.each(data, (seria) => {
+                        if (!seria.disabled) result.push(seria);
+                    });
+
+                    return _.cloneDeep(result);
+                }
 
                 /**
                  * Instantiate chart
@@ -128,28 +153,31 @@
                 });
 
                 function drawEmptyState() {
-                    if (!$element.find('text.nv-noData').get(0)) return;
+                    if (!$element.find('text.nv-noData').get(0)) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                    } else {
+                        chartElem
+                            .append("defs")
+                            .append("pattern")
+                            .attr("height", 1)
+                            .attr("width", 1)
+                            .attr("x", "0")
+                            .attr("y", "0")
+                            .attr("id", "bg")
+                            .append("image")
+                            .attr('x', 27)
+                            .attr('y', 0)
+                            .attr('height', "100%")
+                            .attr('width', 1151)
+                            .attr("xlink:href", "images/line_chart_empty_state.svg");
 
-                    chartElem
-                        .append("defs")
-                        .append("pattern")
-                        .attr("height", 1)
-                        .attr("width", 1)
-                        .attr("x", "0")
-                        .attr("y", "0")
-                        .attr("id", "bg")
-                        .append("image")
-                        .attr('x', 27)
-                        .attr('y', 0)
-                        .attr('height', "100%")
-                        .attr('width', 1151)
-                        .attr("xlink:href", "images/line_chart_empty_state.svg");
-
-                    chartElem
-                        .append('rect')
-                        .attr('height', "100%")
-                        .attr('width', "100%")
-                        .attr('fill', 'url(#bg)');
+                        chartElem
+                            .append('rect')
+                            .classed('empty-state', true)
+                            .attr('height', "100%")
+                            .attr('width', "100%")
+                            .attr('fill', 'url(#bg)');
+                    }
                 }
 
                 function updateScroll(domains, boundary) {

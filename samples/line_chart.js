@@ -51,8 +51,14 @@
                 }
             ];
 
+            $scope.series2 = _.cloneDeep($scope.series);
+
             function nextStep() {
                 $scope.series.forEach(function (seria) {
+                    seria.values.push({value: Math.random() * 3000, x: seria.values.length * 100});
+                });
+
+                $scope.series2.forEach(function (seria) {
                     seria.values.push({value: Math.random() * 3000, x: seria.values.length * 100});
                 });
             }

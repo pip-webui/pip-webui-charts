@@ -37,7 +37,7 @@
                 //colors = _.sample(colors, colors.length);
 
                 // sets legend params
-                vm.legend = vm.data[0].values;
+                vm.legend = vm.data[0] ? vm.data[0].values : [];
                 
                 // Sets colors of items
                 generateParameterColor();
@@ -48,14 +48,16 @@
 
                 $scope.$watch('barChart.series', function (updatedSeries) {
                     vm.data = updatedSeries || [];
-
                     generateParameterColor();
 
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         chart.update();
-                        // Todo: the method does not exist
-                        //intervalUpdate(chart.update, 10);
+                        drawEmptyState();
+
+                        $timeout(function() {
+                            vm.legend = vm.data[0] ? vm.data[0].values : [];
+                        });
                     }
                 });
 
@@ -96,20 +98,51 @@
                     });
 
                     $timeout(configBarWidthAndLabel, 0);
+                    drawEmptyState();
                 });
+
+                function drawEmptyState() {
+                    if ($element.find('.nv-noData').length === 0) {
+                        d3.select($element.find('.empty-state')[0]).remove();
+                    } else {
+                        $element.find('.nv-noData').attr('x', 100);
+
+                        let g = chartElem.append('g').classed('empty-state', true);
+
+                        g.append('g')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 260)
+                            .attr('width', 38);
+
+                        g.append('g')
+                            .attr('transform', 'translate(46, 60)')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 200)
+                            .attr('width', 38);
+
+                        g.append('g')
+                            .attr('transform', 'translate(92, 160)')
+                            .style('fill', 'rgba(0, 0, 0, 0.08)')
+                            .append('rect')
+                            .attr('height', 100)
+                            .attr('width', 38);
+                    }
+                }
 
                 /**
                  * Aligns value label according to parent container size.
                  * @return {void}
                  */
                 function configBarWidthAndLabel() {
-                    var labels = d3.selectAll('.nv-bar text')[0],
-                        chartBars = d3.selectAll('.nv-bar')[0],
-                        parentHeight = (<any>d3.select('.nvd3-svg')[0][0]).getBBox().height;
+                    var labels = $element.find('.nv-bar text'),
+                        chartBars = $element.find('.nv-bar'),
+                        parentHeight = (<any>$element.find('.nvd3-svg')[0]).getBBox().height;
 
-                    d3.select('.bar-chart').classed('visible', true);
+                    d3.select($element.find('.bar-chart')[0]).classed('visible', true);
 
-                    chartBars.forEach(function (item, index) {
+                    chartBars.each(function (index, item) {
                         var barSize = (<any>item).getBBox(),
                             element = d3.select(item),
                             y = d3.transform(element.attr('transform')).translate[1];
@@ -149,7 +182,9 @@
                  * @private
                  */
                 function generateParameterColor() {
-                    vm.legend.forEach(function (item, index) {
+                    if (!vm.data[0] || !vm.data) return;
+
+                    vm.data[0].values.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
