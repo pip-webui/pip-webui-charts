@@ -23,7 +23,7 @@
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                vm.legend = vm.data[0] ? vm.data[0].values : [];
+                vm.legend = vm.data[0].values;
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -34,10 +34,6 @@
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         chart.update();
-                        drawEmptyState();
-                        $timeout(function () {
-                            vm.legend = vm.data[0] ? vm.data[0].values : [];
-                        });
                     }
                 });
                 nv.addGraph(function () {
@@ -67,38 +63,11 @@
                         $timeout(configBarWidthAndLabel, 0);
                     });
                     $timeout(configBarWidthAndLabel, 0);
-                    drawEmptyState();
                 });
-                function drawEmptyState() {
-                    if ($element.find('.nv-noData').length === 0) {
-                        d3.select($element.find('.empty-state')[0]).remove();
-                    }
-                    else {
-                        $element.find('.nv-noData').attr('x', 100);
-                        var g = chartElem.append('g').classed('empty-state', true);
-                        g.append('g')
-                            .style('fill', 'rgba(0, 0, 0, 0.08)')
-                            .append('rect')
-                            .attr('height', 260)
-                            .attr('width', 38);
-                        g.append('g')
-                            .attr('transform', 'translate(46, 60)')
-                            .style('fill', 'rgba(0, 0, 0, 0.08)')
-                            .append('rect')
-                            .attr('height', 200)
-                            .attr('width', 38);
-                        g.append('g')
-                            .attr('transform', 'translate(92, 160)')
-                            .style('fill', 'rgba(0, 0, 0, 0.08)')
-                            .append('rect')
-                            .attr('height', 100)
-                            .attr('width', 38);
-                    }
-                }
                 function configBarWidthAndLabel() {
-                    var labels = $element.find('.nv-bar text'), chartBars = $element.find('.nv-bar'), parentHeight = $element.find('.nvd3-svg')[0].getBBox().height;
-                    d3.select($element.find('.bar-chart')[0]).classed('visible', true);
-                    chartBars.each(function (index, item) {
+                    var labels = d3.selectAll('.nv-bar text')[0], chartBars = d3.selectAll('.nv-bar')[0], parentHeight = d3.select('.nvd3-svg')[0][0].getBBox().height;
+                    d3.select('.bar-chart').classed('visible', true);
+                    chartBars.forEach(function (item, index) {
                         var barSize = item.getBBox(), element = d3.select(item), y = d3.transform(element.attr('transform')).translate[1];
                         element
                             .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
@@ -120,9 +89,7 @@
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
                 function generateParameterColor() {
-                    if (!vm.data[0] || !vm.data)
-                        return;
-                    vm.data[0].values.forEach(function (item, index) {
+                    vm.legend.forEach(function (item, index) {
                         item.color = item.color || materialColorToRgba(colors[index]);
                     });
                 }
@@ -215,8 +182,7 @@
                 series: '=pipSeries',
                 showYAxis: '=pipYAxis',
                 showXAxis: '=pipXAxis',
-                dynamic: '=pipDynamic',
-                interactiveLegend: '=pipInterLegend'
+                dynamic: '=pipDynamic'
             },
             bindToController: true,
             controllerAs: 'lineChart',
@@ -230,8 +196,7 @@
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
-                vm.data = prepareData(vm.series) || [];
-                vm.legend = _.clone(vm.series);
+                vm.data = vm.series || [];
                 vm.sourceEvents = [];
                 vm.isVisibleX = function () {
                     return vm.showXAxis == undefined ? true : vm.showXAxis;
@@ -257,34 +222,14 @@
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
                 $scope.$watch('lineChart.series', function (updatedSeries) {
-                    vm.data = prepareData(updatedSeries);
-                    vm.legend = _.clone(vm.series);
+                    vm.data = updatedSeries;
                     generateParameterColor();
                     if (chart) {
                         chartElem.datum(vm.data || []).call(chart);
-                        drawEmptyState();
                         if (updateZoomOptions)
                             updateZoomOptions(vm.data);
                     }
                 }, true);
-                $scope.$watch('lineChart.legend', function (updatedLegend) {
-                    vm.data = prepareData(updatedLegend);
-                    vm.legend = updatedLegend;
-                    if (chart) {
-                        chartElem.datum(vm.data || []).call(chart);
-                        drawEmptyState();
-                        if (updateZoomOptions)
-                            updateZoomOptions(vm.data);
-                    }
-                }, true);
-                function prepareData(data) {
-                    var result = [];
-                    _.each(data, function (seria) {
-                        if (!seria.disabled)
-                            result.push(seria);
-                    });
-                    return _.cloneDeep(result);
-                }
                 nv.addGraph(function () {
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 30 })
@@ -323,31 +268,27 @@
                     drawEmptyState();
                 });
                 function drawEmptyState() {
-                    if (!$element.find('text.nv-noData').get(0)) {
-                        d3.select($element.find('.empty-state')[0]).remove();
-                    }
-                    else {
-                        chartElem
-                            .append("defs")
-                            .append("pattern")
-                            .attr("height", 1)
-                            .attr("width", 1)
-                            .attr("x", "0")
-                            .attr("y", "0")
-                            .attr("id", "bg")
-                            .append("image")
-                            .attr('x', 27)
-                            .attr('y', 0)
-                            .attr('height', "100%")
-                            .attr('width', 1151)
-                            .attr("xlink:href", "images/line_chart_empty_state.svg");
-                        chartElem
-                            .append('rect')
-                            .classed('empty-state', true)
-                            .attr('height', "100%")
-                            .attr('width', "100%")
-                            .attr('fill', 'url(#bg)');
-                    }
+                    if (!$element.find('text.nv-noData').get(0))
+                        return;
+                    chartElem
+                        .append("defs")
+                        .append("pattern")
+                        .attr("height", 1)
+                        .attr("width", 1)
+                        .attr("x", "0")
+                        .attr("y", "0")
+                        .attr("id", "bg")
+                        .append("image")
+                        .attr('x', 27)
+                        .attr('y', 0)
+                        .attr('height', "100%")
+                        .attr('width', 1151)
+                        .attr("xlink:href", "images/line_chart_empty_state.svg");
+                    chartElem
+                        .append('rect')
+                        .attr('height', "100%")
+                        .attr('width', "100%")
+                        .attr('fill', 'url(#bg)');
                 }
                 function updateScroll(domains, boundary) {
                     var bDiff = boundary[1] - boundary[0], domDiff = domains[1] - domains[0], isEqual = (domains[1] - domains[0]) / bDiff === 1;
@@ -593,7 +534,6 @@
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
                         $timeout(resizeTitleLabel);
-                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     }
                 }, true);
                 generateParameterColor();
@@ -632,7 +572,6 @@
                     nv.utils.windowResize(function () {
                         chart.update();
                         $timeout(resizeTitleLabel);
-                        drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     });
                     return chart;
                 }, function () {
@@ -648,29 +587,22 @@
                     });
                 });
                 function drawEmptyState(svg) {
-                    if (!$element.find('text.nv-noData').get(0)) {
-                        d3.select($element.find('.empty-state')[0]).remove();
-                        $element.find('.pip-empty-pie-text').remove();
-                    }
-                    else {
-                        if ($element.find('.pip-empty-pie-text').length === 0) {
-                            $element.find('.pie-chart')
-                                .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
-                        }
-                        var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
-                        var arc = d3.svg.arc()
-                            .innerRadius(size / 2 - 20)
-                            .outerRadius(size / 2 - 57);
-                        svg = d3.select(svg)
-                            .append("g")
-                            .classed('empty-state', true)
-                            .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
-                        var path = svg.selectAll("path")
-                            .data(pie([1]))
-                            .enter().append("path")
-                            .attr("fill", "rgba(0, 0, 0, 0.08)")
-                            .attr("d", arc);
-                    }
+                    if (!$element.find('text.nv-noData').get(0))
+                        return;
+                    $element.find('.pie-chart')
+                        .append("<div class='pip-empty-pie-text'>There is no data right now...</div>");
+                    var pie = d3.layout.pie().sort(null), size = Number(vm.size || 250);
+                    var arc = d3.svg.arc()
+                        .innerRadius(size / 2 - 20)
+                        .outerRadius(size / 2 - 57);
+                    svg = d3.select(svg)
+                        .append("g")
+                        .attr('transform', "translate(" + size / 2 + "," + size / 2 + ")");
+                    var path = svg.selectAll("path")
+                        .data(pie([1]))
+                        .enter().append("path")
+                        .attr("fill", "rgba(0, 0, 0, 0.08)")
+                        .attr("d", arc);
                 }
                 function renderTotalLabel(svgElem) {
                     if ((!vm.total && !vm.donut) || !vm.data)
@@ -723,11 +655,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart">\n' +
-    '    <svg ></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+    '<div class="bar-chart flex-auto layout-column"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
 
@@ -739,28 +667,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('legend/interactive_legend.html',
-    '<div >\n' +
-    '    <div class="chart-legend-item" ng-repeat="item in series">\n' +
-    '        <md-checkbox class="lp16 m8"\n' +
-    '                     ng-model="item.disabled"\n' +
-    '                     ng-true-value="false"\n' +
-    '                     ng-false-value="true"\n' +
-    '                     ng-if="interactive"\n' +
-    '                     aria-label="{{ item.label }}">\n' +
-    '            <p class="legend-item-value"\n' +
-    '                ng-if="item.value"\n' +
-    '               ng-style="{\'background-color\': item.color}">\n' +
-    '                {{ item.value }}\n' +
-    '            </p>\n' +
-    '            <p class="legend-item-label">{{:: item.label || item.key }}</p>\n' +
-    '        </md-checkbox>\n' +
-    '\n' +
-    '        <div ng-if="!interactive">\n' +
-    '            <span class="bullet" ng-style="{\'background-color\': item.color}"></span>\n' +
-    '            <span>{{:: item.label || item.key}}</span>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '</div>');
+    '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
 }]);
 })();
 
@@ -772,24 +679,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column">\n' +
-    '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}">\n' +
-    '    </svg>\n' +
-    '    <div class="scroll-container">\n' +
-    '        <div class="visual-scroll">\n' +
-    '            <div class="scrolled-block"></div>\n' +
-    '        </div>\n' +
-    '    </div>\n' +
-    '    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">\n' +
-    '        <md-icon md-svg-icon="icons:minus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">\n' +
-    '        <md-icon md-svg-icon="icons:plus-circle"></md-icon>\n' +
-    '    </md-button>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>\n' +
-    '');
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="visual-scroll"><div class="scrolled-block"></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.data" pip-interactive="false"></pip-chart-legend>');
 }]);
 })();
 
@@ -801,11 +691,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !pieChart.donut}">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 
