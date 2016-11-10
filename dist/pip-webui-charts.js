@@ -215,6 +215,8 @@
                 series: '=pipSeries',
                 showYAxis: '=pipYAxis',
                 showXAxis: '=pipXAxis',
+                xFormat: '=pipXFormat',
+                xTickFormat: '=pipXTickFormat',
                 dynamic: '=pipDynamic',
                 interactiveLegend: '=pipInterLegend'
             },
@@ -289,7 +291,7 @@
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 30 })
                         .x(function (d) {
-                        return d.x;
+                        return vm.xFormat ? vm.xFormat(d.x) : d.x;
                     })
                         .y(function (d) {
                         return d.value;
@@ -306,11 +308,11 @@
                     chart.noData('There is no data right now...');
                     chart.yAxis
                         .tickFormat(function (d) {
-                        return d / 1000 + 'k';
+                        return d;
                     });
                     chart.xAxis
                         .tickFormat(function (d) {
-                        return d.toFixed(2);
+                        return vm.xTickFormat ? vm.xTickFormat(d) : d;
                     });
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
                     chartElem.datum(vm.data || []).style('height', 270).call(chart);
@@ -514,8 +516,8 @@
                         var maxVal, minVal = null;
                         for (var i = 0; i < data.length; i++) {
                             if (!data[i].disabled) {
-                                var tempMinVal = d3.max(data[i].values, function (d) { return d.x; });
-                                var tempMaxVal = d3.min(data[i].values, function (d) { return d.x; });
+                                var tempMinVal = d3.max(data[i].values, function (d) { return vm.xFormat ? vm.xFormat(d.x) : d.x; });
+                                var tempMaxVal = d3.min(data[i].values, function (d) { return vm.xFormat ? vm.xFormat(d.x) : d.x; });
                                 minVal = (!minVal || tempMinVal < minVal) ? tempMinVal : minVal;
                                 maxVal = (!maxVal || tempMaxVal > maxVal) ? tempMaxVal : maxVal;
                             }

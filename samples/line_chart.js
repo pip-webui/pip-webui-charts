@@ -7,45 +7,51 @@
 
     thisModule.controller('LineChartController',
         function ($scope, $interval) {
+            var startYear = 2022;
+
             $scope.showX = true;
             $scope.showY = true;
             
+            $scope.formatX = function(x) {
+                return new Date(x).getFullYear();
+            }
+
             $scope.series = [{
                 key: 'Completed',
                 values: [
-                    {value: 1000, x: 0},
-                    {value: 3000, x: 100},
-                    {value: 2200, x: 200, color: '#ef5350'},
-                    {value: 1500, x: 300},
-                    {value: 1800, x: 400},
-                    {value: 2800, x: 500},
-                    {value: 900, x: 600}
+                    {value: 1000, x: new Date(2015, 0, 0, 0)},
+                    {value: 3000, x: new Date(2016, 0, 0, 0)},
+                    {value: 2200, x: new Date(2017, 0, 0, 0), color: '#ef5350'},
+                    {value: 1500, x: new Date(2018, 0, 0, 0)},
+                    {value: 1800, x: new Date(2019, 0, 0, 0)},
+                    {value: 2800, x: new Date(2020, 0, 0, 0)},
+                    {value: 900, x: new Date(2021, 0, 0, 0)}
                 ],
                 color: '#4caf50'
             },
                 {
                     key: 'Uncompleted',
                     values: [
-                        {value: 500, x: 0},
-                        {value: 400, x: 100},
-                        {value: 1200, x: 200},
-                        {value: 300, x: 300},
-                        {value: 100, x: 400},
-                        {value: 280, x: 500},
-                        {value: 500, x: 600}
+                        {value: 500, x: new Date(2015, 0, 0, 0)},
+                        {value: 400, x: new Date(2016, 0, 0, 0)},
+                        {value: 1200, x: new Date(2017, 0, 0, 0)},
+                        {value: 300, x: new Date(2018, 0, 0, 0)},
+                        {value: 100, x: new Date(2019, 0, 0, 0)},
+                        {value: 280, x: new Date(2020, 0, 0, 0)},
+                        {value: 500, x: new Date(2021, 0, 0, 0)}
                     ],
                     color: '#fe9702'
                 },
                 {
                     key: 'Failures',
                     values: [
-                        {value: 100, x: 0},
-                        {value: 200, x: 100},
-                        {value: 150, x: 200},
-                        {value: 120, x: 300},
-                        {value: 50, x: 400},
-                        {value: 300, x: 500},
-                        {value: 20, x: 600}
+                        {value: 100, x: new Date(2015, 0, 0, 0)},
+                        {value: 200, x: new Date(2016, 0, 0, 0)},
+                        {value: 150, x: new Date(2017, 0, 0, 0)},
+                        {value: 120, x: new Date(2018, 0, 0, 0)},
+                        {value: 50, x: new Date(2019, 0, 0, 0)},
+                        {value: 300, x: new Date(2020, 0, 0, 0)},
+                        {value: 20, x: new Date(2021, 0, 0, 0)}
                     ],
                     color: '#ef5350'
                 }
@@ -55,12 +61,13 @@
 
             function nextStep() {
                 $scope.series.forEach(function (seria) {
-                    seria.values.push({value: Math.random() * 3000, x: seria.values.length * 100});
+                    seria.values.push({value: Math.random() * 3000, x: new Date(startYear, 0, 0, 0)});
                 });
 
                 $scope.series2.forEach(function (seria) {
-                    seria.values.push({value: Math.random() * 3000, x: seria.values.length * 100});
+                    seria.values.push({value: Math.random() * 3000, x: new Date(startYear, 0, 0, 0)});
                 });
+                startYear++;
             }
 
             $interval(nextStep, 15000);
