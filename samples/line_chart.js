@@ -16,6 +16,10 @@
                 return new Date(x).getFullYear();
             }
 
+            $scope.formatXTick = function(x) {
+                return x + ' y.';
+            }
+
             $scope.series = [{
                 key: 'Completed',
                 values: [
