@@ -150,7 +150,8 @@
                         element
                             .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
                             .select('rect')
-                            .attr('width', 38);
+                            .attr('width', '38')
+                            .attr('height', Number(element.select('rect').attr('height')) + 1);
 
                         element
                             .transition()
