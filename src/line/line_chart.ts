@@ -141,7 +141,7 @@
                         });
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
-                    chartElem.datum(vm.data || []).style('height', 270).call(chart);
+                    chartElem.datum(vm.data || []).style('height', '270px').call(chart);
 
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
