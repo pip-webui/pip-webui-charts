@@ -23,7 +23,7 @@
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                vm.legend = vm.data[0] ? vm.data[0].values : [];
+                vm.legend = vm.data ? vm.data : [];
                 generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -36,14 +36,14 @@
                         chart.update();
                         drawEmptyState();
                         $timeout(function () {
-                            vm.legend = vm.data[0] ? vm.data[0].values : [];
+                            vm.legend = vm.data ? vm.data : [];
                         });
                     }
                 });
                 nv.addGraph(function () {
                     chart = nv.models.discreteBarChart()
                         .margin({ top: 10, right: 0, bottom: 0, left: -50 })
-                        .x(function (d) { return d.label; })
+                        .x(function (d) { return d.label || d.key; })
                         .y(function (d) { return d.value; })
                         .showValues(true)
                         .showXAxis(false)
@@ -120,10 +120,13 @@
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
                 function generateParameterColor() {
-                    if (!vm.data[0] || !vm.data)
+                    if (!vm.data)
                         return;
-                    vm.data[0].values.forEach(function (item, index) {
-                        item.color = item.color || materialColorToRgba(colors[index]);
+                    vm.data.forEach(function (item, index) {
+                        if (item.values[0]) {
+                            item.values[0].color = item.values[0].color || materialColorToRgba(colors[index]);
+                            item.color = item.values[0].color;
+                        }
                     });
                 }
             }]

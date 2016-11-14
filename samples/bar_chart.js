@@ -8,12 +8,14 @@
     thisModule.controller('BarChartController',
         function ($scope) {
             $scope.series = [{
-                key: 'Some key',
-                values: [
-                    {value: 980, label: 'Completed', color: '#4caf50'},
-                    {value: 710, label: 'Uncompleted', color: '#fe9702'},
-                    {value: 250, label: 'Failures', color: '#ef5350'}
-                ]
+                key: 'Completed',
+                values: [{value: 980, color: '#4caf50'}]
+            }, {
+            	key: 'Uncompleted',
+            	values: [{value: 710, color: '#fe9702'}]
+            }, {
+            	key: 'Failures',
+            	values: [{value: 250, color: '#ef5350'}]
             }];
 
             $scope.setOrUnset = "Set";
