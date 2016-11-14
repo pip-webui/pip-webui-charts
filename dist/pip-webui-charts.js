@@ -59,7 +59,7 @@
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
                         .datum(vm.data)
-                        .style('height', 270)
+                        .style('height', '270px')
                         .call(chart);
                     return chart;
                 }, function () {
@@ -626,8 +626,8 @@
                     chart.showLegend(false);
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
-                        .attr('height', vm.size || 250)
-                        .attr('width', vm.size || 250)
+                        .attr('height', vm.size || 250 + 'px')
+                        .attr('width', vm.size || 250 + 'px')
                         .style('opacity', 0)
                         .datum(vm.data || [])
                         .call(chart);

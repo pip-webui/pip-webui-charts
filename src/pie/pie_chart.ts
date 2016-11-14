@@ -92,8 +92,8 @@
 
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart svg')
-                        .attr('height', vm.size || 250)
-                        .attr('width', vm.size || 250)
+                        .attr('height', vm.size || 250 + 'px')
+                        .attr('width', vm.size || 250 + 'px')
                         .style('opacity', 0)
                         .datum(vm.data || [])
                         .call(chart);

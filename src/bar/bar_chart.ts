@@ -86,7 +86,7 @@
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
                         .datum(vm.data)
-                        .style('height', 270)
+                        .style('height', '270px')
                         .call(chart);
 
                     //nv.utils.windowResize(chart.update);
