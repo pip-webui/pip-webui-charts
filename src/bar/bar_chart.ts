@@ -33,13 +33,13 @@
                 let height = 270;
 
                 vm.data = prepareData(vm.series) || [];
-                // Sets colors of items
-                generateParameterColor();
                 vm.legend = _.clone(vm.series);
                 
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
+
+                generateParameterColor();
 
                 (<any>d3.scale).paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
@@ -93,7 +93,7 @@
                         .duration(0)
                         .height(height)
                         .color(function(d) {
-                            return d.color || (<any>d3.scale).paletteColors().range();
+                            return d.color || materialColorToRgba(colors[d.series]);
                         });
 
                     chart.tooltip.enabled(false);

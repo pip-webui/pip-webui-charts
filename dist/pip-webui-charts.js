@@ -24,11 +24,11 @@
                 });
                 var height = 270;
                 vm.data = prepareData(vm.series) || [];
-                generateParameterColor();
                 vm.legend = _.clone(vm.series);
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
+                generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
@@ -72,7 +72,7 @@
                         .duration(0)
                         .height(height)
                         .color(function (d) {
-                        return d.color || d3.scale.paletteColors().range();
+                        return d.color || materialColorToRgba(colors[d.series]);
                     });
                     chart.tooltip.enabled(false);
                     chart.noData('There is no data right now...');
