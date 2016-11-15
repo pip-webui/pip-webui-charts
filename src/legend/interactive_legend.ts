@@ -49,7 +49,7 @@
                     if (!$scope.series) return;
 
                     $scope.series.forEach(function (item, index) {
-                        item.color = item.color || colors[index];
+                        item.color = item.color || (item.values && item.values[0] && item.values[0].color ? item.values[0].color : colors[index]);
                         item.disabled = item.disabled || false;
                     });   
                 }

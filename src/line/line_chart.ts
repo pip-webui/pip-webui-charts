@@ -20,6 +20,7 @@
                 showXAxis: '=pipXAxis',
                 xFormat: '=pipXFormat',
                 xTickFormat: '=pipXTickFormat',
+                yTickFormat: '=pipYTickFormat',
                 dynamic: '=pipDynamic',
                 interactiveLegend: '=pipInterLegend'
             },
@@ -111,7 +112,7 @@
                  */
                 nv.addGraph(() => {
                     chart = nv.models.lineChart()
-                        .margin({ top: 20, right: 20, bottom: 30, left: 30 })
+                        .margin({ top: 20, right: 20, bottom: 30, left: 50 })
                         .x(function (d) {
                             return vm.xFormat ? vm.xFormat(d.x) : d.x;
                         })
@@ -132,7 +133,7 @@
 
                     chart.yAxis
                         .tickFormat(function (d) {
-                            return d;
+                            return vm.yTickFormat ? vm.yTickFormat(d) : d;
                         });
 
                     chart.xAxis
@@ -167,7 +168,7 @@
                             .attr("y", "0")
                             .attr("id", "bg")
                             .append("image")
-                            .attr('x', 27)
+                            .attr('x', 47)
                             .attr('y', 0)
                             .attr('height', "100%")
                             .attr('width', 1151)

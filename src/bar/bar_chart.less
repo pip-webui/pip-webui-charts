@@ -2,7 +2,6 @@ pip-bar-chart {
   .bar-chart {
     opacity: 0;
     margin-bottom: 20px;
-    display: inline-block;
 
     &.visible {
       opacity: 1;
@@ -13,14 +12,36 @@ pip-bar-chart {
       font-family: 'Roboto';
     }
 
-    .nv-zeroLine {
-      display: none;
-    }
-
     .nv-noData {
       font-size: 14px;
       font-weight: normal;
       fill: rgba(0, 0, 0, 0.54);
+    }
+  }
+
+  .nvd3 {
+    .nv-axis {
+      line {
+        stroke-dasharray: 3, 3;
+        stroke: rgba(0, 0, 0, 0.12);
+      }
+
+      .nv-zeroLine {
+        line {
+          stroke-dasharray: none;
+        }
+      }
+
+      path {
+        stroke: rgba(0, 0, 0, 0.26);
+      }
+
+      text {
+        font-family: Roboto;
+        font-size: 14px;
+        font-weight: 500 !important;
+        fill: rgba(0, 0, 0, 0.54);
+      }
     }
   }
 

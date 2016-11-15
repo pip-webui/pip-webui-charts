@@ -7,7 +7,10 @@
         return {
             restrict: 'E',
             scope: {
-                series: '=pipSeries'
+                series: '=pipSeries',
+                xTickFormat: '=pipXTickFormat',
+                yTickFormat: '=pipYTickFormat',
+                interactiveLegend: '=pipInterLegend'
             },
             bindToController: true,
             controllerAs: 'barChart',
@@ -19,53 +22,79 @@
                 var colors = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
-                vm.data = vm.series || [];
+                var height = 270;
+                vm.data = prepareData(vm.series) || [];
+                generateParameterColor();
+                vm.legend = _.clone(vm.series);
                 if ((vm.series || []).length > colors.length) {
                     vm.data = vm.series.slice(0, 9);
                 }
-                vm.legend = vm.data ? vm.data : [];
-                generateParameterColor();
                 d3.scale.paletteColors = function () {
                     return d3.scale.ordinal().range(colors.map(materialColorToRgba));
                 };
                 $scope.$watch('barChart.series', function (updatedSeries) {
-                    vm.data = updatedSeries || [];
+                    vm.data = prepareData(updatedSeries);
+                    vm.legend = _.clone(vm.series);
                     generateParameterColor();
                     if (chart) {
                         chartElem.datum(vm.data).call(chart);
-                        chart.update();
+                        configBarWidthAndLabel();
                         drawEmptyState();
-                        $timeout(function () {
-                            vm.legend = vm.data ? vm.data : [];
-                        });
                     }
                 });
+                $scope.$watch('barChart.legend', function (updatedLegend) {
+                    vm.data = prepareData(updatedLegend);
+                    vm.legend = updatedLegend;
+                    if (chart) {
+                        chartElem.datum(vm.data).call(chart);
+                        configBarWidthAndLabel();
+                        drawEmptyState();
+                    }
+                }, true);
+                function prepareData(data) {
+                    var result = [];
+                    _.each(data, function (seria) {
+                        if (!seria.disabled)
+                            result.push(seria);
+                    });
+                    return _.cloneDeep(result);
+                }
                 nv.addGraph(function () {
                     chart = nv.models.discreteBarChart()
-                        .margin({ top: 10, right: 0, bottom: 0, left: -50 })
-                        .x(function (d) { return d.label || d.key; })
+                        .margin({ top: 10, right: 0, bottom: 10, left: 50 })
+                        .x(function (d) { return d.label || d.key || d.x; })
                         .y(function (d) { return d.value; })
                         .showValues(true)
-                        .showXAxis(false)
-                        .showYAxis(false)
+                        .staggerLabels(true)
+                        .showXAxis(true)
+                        .showYAxis(true)
                         .valueFormat(d3.format('d'))
                         .duration(0)
-                        .height(270)
+                        .height(height)
                         .color(function (d) {
                         return d.color || d3.scale.paletteColors().range();
                     });
                     chart.tooltip.enabled(false);
                     chart.noData('There is no data right now...');
+                    chart.yAxis
+                        .tickFormat(function (d) {
+                        return vm.yTickFormat ? vm.yTickFormat(d) : d;
+                    });
+                    chart.xAxis
+                        .tickFormat(function (d) {
+                        return vm.xTickFormat ? vm.xTickFormat(d) : d;
+                    });
                     chartElem = d3.select($element.get(0))
                         .select('.bar-chart svg')
                         .datum(vm.data)
-                        .style('height', '270px')
+                        .style('height', '285px')
                         .call(chart);
+                    nv.utils.windowResize(function () {
+                        chart.update();
+                        configBarWidthAndLabel(0);
+                    });
                     return chart;
                 }, function () {
-                    chart.dispatch.on('beforeUpdate', function () {
-                        $timeout(configBarWidthAndLabel, 0);
-                    });
                     $timeout(configBarWidthAndLabel, 0);
                     drawEmptyState();
                 });
@@ -79,7 +108,7 @@
                         g.append('g')
                             .style('fill', 'rgba(0, 0, 0, 0.08)')
                             .append('rect')
-                            .attr('height', 260)
+                            .attr('height', height - 10)
                             .attr('width', 38);
                         g.append('g')
                             .attr('transform', 'translate(46, 60)')
@@ -95,23 +124,23 @@
                             .attr('width', 38);
                     }
                 }
-                function configBarWidthAndLabel() {
+                function configBarWidthAndLabel(timeout) {
+                    if (timeout === void 0) { timeout = 1000; }
                     var labels = $element.find('.nv-bar text'), chartBars = $element.find('.nv-bar'), parentHeight = $element.find('.nvd3-svg')[0].getBBox().height;
                     d3.select($element.find('.bar-chart')[0]).classed('visible', true);
                     chartBars.each(function (index, item) {
-                        var barSize = item.getBBox(), element = d3.select(item), y = d3.transform(element.attr('transform')).translate[1];
+                        var barHeight = Number(d3.select(item).select('rect').attr('height')), barWidth = Number(d3.select(item).select('rect').attr('width')), element = d3.select(item), x = d3.transform(element.attr('transform')).translate[0], y = d3.transform(element.attr('transform')).translate[1];
                         element
-                            .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + parentHeight + ')')
-                            .select('rect')
-                            .attr('width', '38')
-                            .attr('height', Number(element.select('rect').attr('height')) + 1);
+                            .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + (height - 20) + ')')
+                            .select('rect').attr('height', 0);
                         element
                             .transition()
-                            .duration(1000)
-                            .attr('transform', 'translate(' + Number(index * (38 + 8) + 50) + ', ' + y + ')');
+                            .duration(timeout)
+                            .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + y + ')')
+                            .select('rect').attr('height', barHeight);
                         d3.select(labels[index])
-                            .attr('dy', barSize.height / 2)
-                            .attr('x', 19);
+                            .attr('dy', barHeight / 2 + 10)
+                            .attr('x', barWidth / 2);
                     });
                 }
                 function materialColorToRgba(color) {
@@ -182,7 +211,7 @@
                     if (!$scope.series)
                         return;
                     $scope.series.forEach(function (item, index) {
-                        item.color = item.color || colors[index];
+                        item.color = item.color || (item.values && item.values[0] && item.values[0].color ? item.values[0].color : colors[index]);
                         item.disabled = item.disabled || false;
                     });
                 }
@@ -221,6 +250,7 @@
                 showXAxis: '=pipXAxis',
                 xFormat: '=pipXFormat',
                 xTickFormat: '=pipXTickFormat',
+                yTickFormat: '=pipYTickFormat',
                 dynamic: '=pipDynamic',
                 interactiveLegend: '=pipInterLegend'
             },
@@ -293,7 +323,7 @@
                 }
                 nv.addGraph(function () {
                     chart = nv.models.lineChart()
-                        .margin({ top: 20, right: 20, bottom: 30, left: 30 })
+                        .margin({ top: 20, right: 20, bottom: 30, left: 50 })
                         .x(function (d) {
                         return vm.xFormat ? vm.xFormat(d.x) : d.x;
                     })
@@ -312,7 +342,7 @@
                     chart.noData('There is no data right now...');
                     chart.yAxis
                         .tickFormat(function (d) {
-                        return d;
+                        return vm.yTickFormat ? vm.yTickFormat(d) : d;
                     });
                     chart.xAxis
                         .tickFormat(function (d) {
@@ -342,7 +372,7 @@
                             .attr("y", "0")
                             .attr("id", "bg")
                             .append("image")
-                            .attr('x', 27)
+                            .attr('x', 47)
                             .attr('y', 0)
                             .attr('height', "100%")
                             .attr('width', 1151)
@@ -729,7 +759,7 @@ try {
 }
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('bar/bar_chart.html',
-    '<div class="bar-chart"><svg></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="false"></pip-chart-legend>');
+    '<div class="bar-chart"><svg></svg></div><pip-chart-legend pip-series="barChart.legend" pip-interactive="barChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -752,8 +782,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 
@@ -764,8 +794,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 

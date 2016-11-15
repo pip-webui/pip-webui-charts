@@ -9,13 +9,13 @@
         function ($scope) {
             $scope.series = [{
                 key: 'Completed',
-                values: [{value: 980, color: '#4caf50'}]
+                values: [{value: 980, color: '#4caf50', label: '5 am'}]
             }, {
             	key: 'Uncompleted',
-            	values: [{value: 710, color: '#fe9702'}]
+            	values: [{value: 710, color: '#fe9702', label: '5 am'}]
             }, {
             	key: 'Failures',
-            	values: [{value: 250, color: '#ef5350'}]
+            	values: [{value: 250, color: '#ef5350', label: '5 am'}]
             }];
 
             $scope.setOrUnset = "Set";
