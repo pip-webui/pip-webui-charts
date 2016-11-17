@@ -28,12 +28,12 @@
             $scope.series2 = [
                 {
                     label: 'Uncompleted',
-                    value: 15,
+                    value: 20015,
                     color: '#fe9702'
                 },
                 {
                     label: 'Failures',
-                    value: 5,
+                    value: 4565,
                     color: '#ef5350'
                 }
             ];

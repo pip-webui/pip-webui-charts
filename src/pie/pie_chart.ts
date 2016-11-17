@@ -91,9 +91,10 @@
                     chart.showLegend(false);
 
                     chartElem = d3.select($element.get(0))
-                        .select('.pie-chart svg')
-                        .attr('height', vm.size || 250 + 'px')
-                        .attr('width', vm.size || 250 + 'px')
+                        .select('.pie-chart')
+                        .style('height', (vm.size || 250) + 'px')
+                        .style('width', (vm.size || 250) + 'px')
+                        .select('svg')
                         .style('opacity', 0)
                         .datum(vm.data || [])
                         .call(chart);
@@ -156,6 +157,8 @@
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
                     }, 0);
+
+                    if (totalVal >= 10000) totalVal = (totalVal / 1000).toFixed(1) + 'k';
                     
                     d3.select(svgElem)
                         .select('.nv-pie:not(.nvd3)')
@@ -171,14 +174,13 @@
                 function resizeTitleLabelUnwrap() {
                     if ((!vm.total && !vm.donut) || !vm.data) return;
 
-                    var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
-                        : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
+                    var boxSize =  $element.find('.nvd3.nv-pieChart').get(0).getBBox();
 
                     if (!boxSize.width || !boxSize.height) {
                         return;
                     }
 
-                    titleElem.style('font-size', ~~boxSize.width / (vm.donut ? 2:2.5)).style('opacity', 1);
+                    titleElem.style('font-size', ~~boxSize.width / 4.5).style('opacity', 1);
                 }
 
                 /**

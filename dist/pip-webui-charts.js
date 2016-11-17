@@ -659,9 +659,10 @@
                     chart.noData('There is no data right now...');
                     chart.showLegend(false);
                     chartElem = d3.select($element.get(0))
-                        .select('.pie-chart svg')
-                        .attr('height', vm.size || 250 + 'px')
-                        .attr('width', vm.size || 250 + 'px')
+                        .select('.pie-chart')
+                        .style('height', (vm.size || 250) + 'px')
+                        .style('width', (vm.size || 250) + 'px')
+                        .select('svg')
                         .style('opacity', 0)
                         .datum(vm.data || [])
                         .call(chart);
@@ -714,6 +715,8 @@
                     var totalVal = vm.data.reduce(function (sum, curr) {
                         return sum + curr.value;
                     }, 0);
+                    if (totalVal >= 10000)
+                        totalVal = (totalVal / 1000).toFixed(1) + 'k';
                     d3.select(svgElem)
                         .select('.nv-pie:not(.nvd3)')
                         .append('text')
@@ -726,12 +729,11 @@
                 function resizeTitleLabelUnwrap() {
                     if ((!vm.total && !vm.donut) || !vm.data)
                         return;
-                    var boxSize = vm.donut ? $element.find('.nv-pieLabels').get(0).getBBox()
-                        : $element.find('.nvd3.nv-pieChart').get(0).getBBox();
+                    var boxSize = $element.find('.nvd3.nv-pieChart').get(0).getBBox();
                     if (!boxSize.width || !boxSize.height) {
                         return;
                     }
-                    titleElem.style('font-size', ~~boxSize.width / (vm.donut ? 2 : 2.5)).style('opacity', 1);
+                    titleElem.style('font-size', ~~boxSize.width / 4.5).style('opacity', 1);
                 }
                 function materialColorToRgba(color) {
                     return 'rgba(' + $mdColorPalette[color][500].value[0] + ','
@@ -770,6 +772,18 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
   $templateCache.put('legend/interactive_legend.html',
     '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
 }]);
@@ -784,18 +798,6 @@ try {
 module.run(['$templateCache', function($templateCache) {
   $templateCache.put('pie/pie_chart.html',
     '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
