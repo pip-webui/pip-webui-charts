@@ -331,7 +331,7 @@
                         return d && d.x ? (vm.xFormat ? vm.xFormat(d.x) : d.x) : d;
                     })
                         .y(function (d) {
-                        return d.value;
+                        return d && d.value ? d.value : d;
                     })
                         .height(270)
                         .useInteractiveGuideline(true)
