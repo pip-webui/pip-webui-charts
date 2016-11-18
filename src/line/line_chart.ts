@@ -118,10 +118,10 @@
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 50 })
                         .x(function (d) {
-                            return d && d.x ? (vm.xFormat ? vm.xFormat(d.x) : d.x) : d;
+                            return (d !== undefined && d.x !== undefined) ? (vm.xFormat ? vm.xFormat(d.x) : d.x) : d;
                         })
                         .y(function (d) {
-                            return d && d.value ? d.value : d;
+                            return (d !== undefined && d.value !== undefined) ? d.value : d;
                         })
                         .height(270)
                         .useInteractiveGuideline(true)

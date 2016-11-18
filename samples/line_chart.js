@@ -20,19 +20,7 @@
                 return x + ' y.';
             }
 
-            $scope.series = [{
-                key: 'Completed',
-                values: [
-                    {value: 1000, x: new Date(2015, 0, 0, 0)},
-                    {value: 3000, x: new Date(2016, 0, 0, 0)},
-                    {value: 2200, x: new Date(2017, 0, 0, 0), color: '#ef5350'},
-                    {value: 1500, x: new Date(2018, 0, 0, 0)},
-                    {value: 1800, x: new Date(2019, 0, 0, 0)},
-                    {value: 2800, x: new Date(2020, 0, 0, 0)},
-                    {value: 900, x: new Date(2021, 0, 0, 0)}
-                ],
-                color: '#4caf50'
-            },
+            $scope.series = [
                 {
                     key: 'Uncompleted',
                     values: [
