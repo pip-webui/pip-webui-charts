@@ -313,6 +313,9 @@
                             updateZoomOptions(vm.data);
                     }
                 }, true);
+                $scope.$on('$destroy', function () {
+                    d3.selectAll('.nvtooltip').style('opacity', 0);
+                });
                 function prepareData(data) {
                     var result = [];
                     _.each(data, function (seria) {
@@ -353,7 +356,10 @@
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
                     }
-                    nv.utils.windowResize(chart.update);
+                    nv.utils.windowResize(function () {
+                        chart.update();
+                        drawEmptyState();
+                    });
                     return chart;
                 }, function () {
                     drawEmptyState();
@@ -363,26 +369,35 @@
                         d3.select($element.find('.empty-state')[0]).remove();
                     }
                     else {
-                        chartElem
-                            .append("defs")
-                            .append("pattern")
-                            .attr("height", 1)
-                            .attr("width", 1)
-                            .attr("x", "0")
-                            .attr("y", "0")
-                            .attr("id", "bg")
-                            .append("image")
-                            .attr('x', 47)
-                            .attr('y', 0)
-                            .attr('height', "100%")
-                            .attr('width', 1151)
-                            .attr("xlink:href", "images/line_chart_empty_state.svg");
-                        chartElem
-                            .append('rect')
-                            .classed('empty-state', true)
-                            .attr('height', "100%")
-                            .attr('width', "100%")
-                            .attr('fill', 'url(#bg)');
+                        var containerWidth = $element.find('.line-chart').innerWidth(), containerHeight = $element.find('.line-chart').innerHeight();
+                        if ($element.find('.empty-state').get(0)) {
+                            chartElem
+                                .select('image')
+                                .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')');
+                        }
+                        else {
+                            chartElem
+                                .append("defs")
+                                .append("pattern")
+                                .attr("height", 1)
+                                .attr("width", 1)
+                                .attr("x", "0")
+                                .attr("y", "0")
+                                .attr("id", "bg")
+                                .append("image")
+                                .attr('x', 27)
+                                .attr('y', 0)
+                                .attr('height', "216px")
+                                .attr('width', "1151px")
+                                .attr('transform', 'scale(' + (containerWidth / 1151) + ',' + (containerHeight / 216) + ')')
+                                .attr("xlink:href", "images/line_chart_empty_state.svg");
+                            chartElem
+                                .append('rect')
+                                .classed('empty-state', true)
+                                .attr('height', "100%")
+                                .attr('width', "100%")
+                                .attr('fill', 'url(#bg)');
+                        }
                     }
                 }
                 function updateScroll(domains, boundary) {
@@ -772,8 +787,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('legend/interactive_legend.html',
-    '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -784,8 +799,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
+  $templateCache.put('legend/interactive_legend.html',
+    '<div><div class="chart-legend-item" ng-repeat="item in series"><md-checkbox class="lp16 m8" ng-model="item.disabled" ng-true-value="false" ng-false-value="true" ng-if="interactive" aria-label="{{ item.label }}"><p class="legend-item-value" ng-if="item.value" ng-style="{\'background-color\': item.color}">{{ item.value }}</p><p class="legend-item-label">{{:: item.label || item.key }}</p></md-checkbox><div ng-if="!interactive"><span class="bullet" ng-style="{\'background-color\': item.color}"></span> <span>{{:: item.label || item.key}}</span></div></div></div>');
 }]);
 })();
 
