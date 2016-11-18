@@ -74,6 +74,6 @@
                 startYear++;
             }
 
-            $interval(nextStep, 15000);
+            //$interval(nextStep, 15000);
         })
 })();

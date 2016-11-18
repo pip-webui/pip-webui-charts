@@ -118,7 +118,7 @@
                     chart = nv.models.lineChart()
                         .margin({ top: 20, right: 20, bottom: 30, left: 50 })
                         .x(function (d) {
-                            return vm.xFormat ? vm.xFormat(d.x) : d.x;
+                            return d && d.x ? (vm.xFormat ? vm.xFormat(d.x) : d.x) : d;
                         })
                         .y(function (d) {
                             return d.value;
