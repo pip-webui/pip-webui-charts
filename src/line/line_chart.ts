@@ -105,7 +105,7 @@
                 function prepareData(data) {
                     let result = [];
                     _.each(data, (seria) => {
-                        if (!seria.disabled) result.push(seria);
+                        if (!seria.disabled && seria.values) result.push(seria);
                     });
 
                     return _.cloneDeep(result);

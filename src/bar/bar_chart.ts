@@ -71,7 +71,7 @@
                 function prepareData(data) {
                     let result = [];
                     _.each(data, (seria) => {
-                        if (!seria.disabled) result.push(seria);
+                        if (!seria.disabled && seria.values) result.push(seria);
                     });
 
                     return _.cloneDeep(result);
@@ -93,7 +93,7 @@
                         .duration(0)
                         .height(height)
                         .color(function(d) {
-                            return d.color || materialColorToRgba(colors[d.series]);
+                            return vm.data[d.series].color || materialColorToRgba(colors[d.series]);
                         });
 
                     chart.tooltip.enabled(false);

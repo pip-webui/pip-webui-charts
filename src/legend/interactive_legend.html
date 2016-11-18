@@ -1,5 +1,5 @@
 <div >
-    <div class="chart-legend-item" ng-repeat="item in series">
+    <div class="chart-legend-item" ng-repeat="item in series" ng-show="item.values || item.value">
         <md-checkbox class="lp16 m8"
                      ng-model="item.disabled"
                      ng-true-value="false"
