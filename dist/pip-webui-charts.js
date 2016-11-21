@@ -617,7 +617,8 @@
                 donut: '=pipDonut',
                 legend: '=pipShowLegend',
                 total: '=pipShowTotal',
-                size: '=pipPieSize'
+                size: '=pipPieSize',
+                centered: '=pipCentered'
             },
             bindToController: true,
             controllerAs: 'pieChart',
@@ -676,7 +677,7 @@
                     chartElem = d3.select($element.get(0))
                         .select('.pie-chart')
                         .style('height', (vm.size || 250) + 'px')
-                        .style('width', (vm.size || 250) + 'px')
+                        .style('width', vm.centered ? '100%' : (vm.size || 250) + 'px')
                         .select('svg')
                         .style('opacity', 0)
                         .datum(vm.data || [])
@@ -684,6 +685,7 @@
                     nv.utils.windowResize(function () {
                         chart.update();
                         $timeout(resizeTitleLabel);
+                        centerChart();
                         drawEmptyState(d3.select($element.get(0)).select('.pie-chart svg')[0][0]);
                     });
                     return chart;
@@ -696,6 +698,7 @@
                             .duration(1000)
                             .style('opacity', 1);
                         $timeout(resizeTitleLabelUnwrap, 800);
+                        centerChart();
                         drawEmptyState(svgElem);
                     });
                 });
@@ -722,6 +725,12 @@
                             .enter().append("path")
                             .attr("fill", "rgba(0, 0, 0, 0.08)")
                             .attr("d", arc);
+                    }
+                }
+                function centerChart() {
+                    if (vm.centered) {
+                        var svgElem = d3.select($element.get(0)).select('.pie-chart svg')[0][0], leftMargin = $(svgElem).innerWidth() / 2 - (vm.size || 250) / 2;
+                        d3.select($element.find('.nv-pieChart')[0]).attr('transform', 'translate(' + leftMargin + ', 0)');
                     }
                 }
                 function renderTotalLabel(svgElem) {
