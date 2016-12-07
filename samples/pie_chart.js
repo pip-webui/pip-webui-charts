@@ -6,7 +6,7 @@
     var thisModule = angular.module('appPieChart', ['pipServices']);
 
     thisModule.controller('PieChartController',
-        function ($scope,) {
+        function ($scope) {
             $scope.series = [
                 {
                     label: 'Completed',

@@ -92,6 +92,7 @@
                     nv.utils.windowResize(function () {
                         chart.update();
                         configBarWidthAndLabel(0);
+                        drawEmptyState();
                     });
                     return chart;
                 }, function () {
@@ -103,25 +104,25 @@
                         d3.select($element.find('.empty-state')[0]).remove();
                     }
                     else {
-                        $element.find('.nv-noData').attr('x', 100);
-                        var g = chartElem.append('g').classed('empty-state', true);
+                        var g = chartElem.append('g').classed('empty-state', true), width = $element.find('.nvd3-svg').innerWidth(), margin = width * 0.1;
                         g.append('g')
                             .style('fill', 'rgba(0, 0, 0, 0.08)')
                             .append('rect')
                             .attr('height', height - 10)
                             .attr('width', 38);
                         g.append('g')
-                            .attr('transform', 'translate(46, 60)')
+                            .attr('transform', 'translate(42, 60)')
                             .style('fill', 'rgba(0, 0, 0, 0.08)')
                             .append('rect')
                             .attr('height', 200)
                             .attr('width', 38);
                         g.append('g')
-                            .attr('transform', 'translate(92, 160)')
+                            .attr('transform', 'translate(84, 160)')
                             .style('fill', 'rgba(0, 0, 0, 0.08)')
                             .append('rect')
                             .attr('height', 100)
                             .attr('width', 38);
+                        g.attr('transform', 'translate(' + (50 + margin) + ', 0), ' + 'scale(' + ((width - 2 * margin) / 126) + ', 1)');
                     }
                 }
                 function configBarWidthAndLabel(timeout) {
@@ -808,8 +809,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie/pie_chart.html',
-    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
+  $templateCache.put('line/line_chart.html',
+    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
@@ -820,8 +821,8 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('line/line_chart.html',
-    '<div class="line-chart" flex="auto" layout="column"><svg class="flex-auto" ng-class="{\'visible-x-axis\': lineChart.isVisibleX(), \'visible-y-axis\': lineChart.isVisibleY()}"></svg><div class="scroll-container"><div class="visual-scroll"><div class="scrolled-block"></div></div></div><md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()"><md-icon md-svg-icon="icons:minus-circle"></md-icon></md-button><md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()"><md-icon md-svg-icon="icons:plus-circle"></md-icon></md-button></div><pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>');
+  $templateCache.put('pie/pie_chart.html',
+    '<div class="pie-chart" ng-class="{\'circle\': !pieChart.donut}"><svg class="flex-auto"></svg></div><pip-chart-legend pip-series="pieChart.data" pip-interactive="false" ng-if="pieChart.showLegend()"></pip-chart-legend>');
 }]);
 })();
 

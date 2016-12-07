@@ -118,6 +118,7 @@
                     nv.utils.windowResize(() => {
                         chart.update();
                          configBarWidthAndLabel(0);
+                         drawEmptyState();
                     });
 
                     return chart;
@@ -131,9 +132,9 @@
                     if ($element.find('.nv-noData').length === 0) {
                         d3.select($element.find('.empty-state')[0]).remove();
                     } else {
-                        $element.find('.nv-noData').attr('x', 100);
-
-                        let g = chartElem.append('g').classed('empty-state', true);
+                        let g = chartElem.append('g').classed('empty-state', true),
+                            width = $element.find('.nvd3-svg').innerWidth(),
+                            margin = width * 0.1;
 
                         g.append('g')
                             .style('fill', 'rgba(0, 0, 0, 0.08)')
@@ -142,18 +143,20 @@
                             .attr('width', 38);
 
                         g.append('g')
-                            .attr('transform', 'translate(46, 60)')
+                            .attr('transform', 'translate(42, 60)')
                             .style('fill', 'rgba(0, 0, 0, 0.08)')
                             .append('rect')
                             .attr('height', 200)
                             .attr('width', 38);
 
                         g.append('g')
-                            .attr('transform', 'translate(92, 160)')
+                            .attr('transform', 'translate(84, 160)')
                             .style('fill', 'rgba(0, 0, 0, 0.08)')
                             .append('rect')
                             .attr('height', 100)
                             .attr('width', 38);
+
+                        g.attr('transform', 'translate(' + (50 + margin) + ', 0), ' + 'scale(' + ((width - 2*margin) / 126) + ', 1)' );
                     }
                 }
 
