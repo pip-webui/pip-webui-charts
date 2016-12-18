@@ -22,6 +22,7 @@
                 xTickFormat: '=pipXTickFormat',
                 yTickFormat: '=pipYTickFormat',
                 dynamic: '=pipDynamic',
+                dHeight: '@pipDiagramHeight',
                 interactiveLegend: '=pipInterLegend'
             },
             bindToController: true,
@@ -33,6 +34,10 @@
                 var chartElem = null;
                 var setZoom = null;
                 var updateZoomOptions = null;
+                console.log('pipDiagramHeight', vm.dHeight);
+                var dHeight = vm.dHeight || 270;
+
+
                 var colors    = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
@@ -123,7 +128,7 @@
                         .y(function (d) {
                             return (d !== undefined && d.value !== undefined) ? d.value : d;
                         })
-                        .height(270)
+                        .height(dHeight)
                         .useInteractiveGuideline(true)
                         .showXAxis(true)
                         .showYAxis(true)
@@ -146,7 +151,7 @@
                         });
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
-                    chartElem.datum(vm.data || []).style('height', '270px').call(chart);
+                    chartElem.datum(vm.data || []).style('height', dHeight + 'px').call(chart);
 
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
