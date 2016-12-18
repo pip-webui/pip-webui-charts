@@ -34,9 +34,7 @@
                 var chartElem = null;
                 var setZoom = null;
                 var updateZoomOptions = null;
-                console.log('pipDiagramHeight', vm.dHeight);
                 var dHeight = vm.dHeight || 270;
-
 
                 var colors    = _.map($mdColorPalette, function (palette, color) {
                     return color;
