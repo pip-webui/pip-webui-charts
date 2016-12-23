@@ -22,7 +22,10 @@
                 xTickFormat: '=pipXTickFormat',
                 yTickFormat: '=pipYTickFormat',
                 dynamic: '=pipDynamic',
-                dHeight: '@pipDiagramHeight',
+                fixedHeight: '@pipDiagramHeight',
+                dynamicHeight: '@pipDynamicHeight',
+                minHeight: '@pipMinHeight',
+                maxHeight: '@pipMaxHeight',
                 interactiveLegend: '=pipInterLegend'
             },
             bindToController: true,
@@ -34,7 +37,10 @@
                 var chartElem = null;
                 var setZoom = null;
                 var updateZoomOptions = null;
-                var dHeight = vm.dHeight || 270;
+                var fixedHeight = vm.fixedHeight || 270;
+                var dynamicHeight = vm.dynamicHeight || false;
+                var minHeight = vm.minHeight || fixedHeight;
+                var maxHeight = vm.maxHeight || fixedHeight;
 
                 var colors    = _.map($mdColorPalette, function (palette, color) {
                     return color;
@@ -114,6 +120,15 @@
                     return _.cloneDeep(result);
                 }
 
+                var getHeight = () => {
+                    if (dynamicHeight) {
+                        var heigth = Math.min(Math.max(minHeight, $element.parent().innerHeight()), maxHeight);
+                        return heigth;
+                    } else {
+                        return fixedHeight;
+                    }
+                };
+
                 /**
                  * Instantiate chart
                  */
@@ -126,7 +141,7 @@
                         .y(function (d) {
                             return (d !== undefined && d.value !== undefined) ? d.value : d;
                         })
-                        .height(dHeight)
+                        .height(getHeight() - 50)
                         .useInteractiveGuideline(true)
                         .showXAxis(true)
                         .showYAxis(true)
@@ -149,13 +164,15 @@
                         });
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
-                    chartElem.datum(vm.data || []).style('height', dHeight + 'px').call(chart);
+                    chartElem.datum(vm.data || []).style('height', (getHeight() - 50) + 'px').call(chart);
 
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
                     }
 
                     nv.utils.windowResize(() => {
+                        chart.height(getHeight() - 50);
+                        chartElem.style('height', (getHeight() - 50) + 'px');
                         chart.update();
                         drawEmptyState();
                     });

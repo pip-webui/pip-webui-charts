@@ -6,7 +6,8 @@
 <md-switch ng-model="showY">Show Y Axis</md-switch>
 
 <pip-line-chart pip-series="series" pip-x-format="formatX" pip-y-axis="showY" pip-x-axis="showX" 
-        pip-inter-legend="true" pip-diagram-height="540"></pip-line-chart>
+        pip-inter-legend="true" pip-diagram-height="540" pip-dynamic-height="true" pip-min-height="270" pip-max-height="400">
+</pip-line-chart>
 
 <md-button ng-click="add()">update </md-button>
 
