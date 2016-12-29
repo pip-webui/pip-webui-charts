@@ -134,7 +134,7 @@
                  */
                 nv.addGraph(() => {
                     chart = nv.models.lineChart()
-                        .margin({ top: 20, right: 20, bottom: 30, left: 50 })
+                        .margin({ top: 20, right: 20, bottom: 30, left: 30 })
                         .x(function (d) {
                             return (d !== undefined && d.x !== undefined) ? (vm.xFormat ? vm.xFormat(d.x) : d.x) : d;
                         })
@@ -203,7 +203,7 @@
                                 .attr("y", "0")
                                 .attr("id", "bg")
                                 .append("image")
-                                .attr('x', 27)
+                                .attr('x', 17)
                                 .attr('y', 0)
                                 .attr('height', "216px")
                                 .attr('width', "1151px")
