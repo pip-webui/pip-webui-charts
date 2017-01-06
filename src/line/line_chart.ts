@@ -170,17 +170,21 @@
                         addZoom(chart, chartElem);
                     }
 
-                    nv.utils.windowResize(() => {
-                        chart.height(getHeight() - 50);
-                        chartElem.style('height', (getHeight() - 50) + 'px');
-                        chart.update();
-                        drawEmptyState();
-                    });
+                    nv.utils.windowResize(() => { onResize(); });
+
+                    $scope.$on('pipMainResized', () => { onResize(); });
 
                     return chart;
                 }, () => {
                     drawEmptyState();
                 });
+
+                function onResize() {
+                    chart.height(getHeight() - 50);
+                    chartElem.style('height', (getHeight() - 50) + 'px');
+                    chart.update();
+                    drawEmptyState();
+                }
 
                 function drawEmptyState() {
                     if (!$element.find('text.nv-noData').get(0)) {
