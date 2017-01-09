@@ -12,7 +12,8 @@
         'pipBarCharts',
         'pipLineCharts',
         'pipPieCharts',
-        'pipChartLegends'
+        'pipChartLegends',
+        'pipCharts.Templates'
     ]);
 
 })();
