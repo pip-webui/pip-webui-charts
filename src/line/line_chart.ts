@@ -42,10 +42,15 @@
                 var minHeight = vm.minHeight || fixedHeight;
                 var maxHeight = vm.maxHeight || fixedHeight;
 
-                var colors    = _.map($mdColorPalette, function (palette, color) {
+                var filteredColor = _.filter($mdColorPalette, function(palette, color){
+                    return _.isObject(color) && _.isObject(color[500] && _.isArray(color[500].value));
+                });
+                var colors = _.map(filteredColor, function (palette, color) {
                     return color;
                 });
-
+                colors = _.filter(colors, function(color){
+                    return _.isObject($mdColorPalette[color]) && _.isObject($mdColorPalette[color][500] && _.isArray($mdColorPalette[color][500].value));
+                });
                 vm.data = prepareData(vm.series) || [];
                 vm.legend = _.clone(vm.series);
                 vm.sourceEvents = [];
@@ -479,11 +484,24 @@
                  * Helpful method
                  * @private
                  */
+                function getMaterialColor(index) {
+                    if (!colors || colors.length < 1) return null;
+
+                    if (index >= colors.length) {
+                        index = 0;
+                    }
+
+                    return materialColorToRgba(colors[index]);
+                }                
+                /**
+                 * Helpful method
+                 * @private
+                 */
                 function generateParameterColor() {
                     if (!vm.data) return;
 
                     vm.data.forEach(function (item, index) {
-                        item.color = item.color || materialColorToRgba(colors[index]);
+                        item.color = item.color || getMaterialColor(index);
                     });
                 }
             }

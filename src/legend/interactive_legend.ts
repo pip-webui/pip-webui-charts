@@ -23,11 +23,16 @@
                 var colors = _.map($mdColorPalette, function (palette) {
                     return palette[500].hex;
                 });
-
+                colors = _.filter(colors, function(color){
+                    return color !== undefined && color !== null;
+                });  
                 function colorCheckboxes() {
                     var checkboxContainers = $($element).find('md-checkbox .md-container');
-                    
+
                     checkboxContainers.each(function (index, item) {
+                        if (index >= $scope.series.length) {
+                            return 
+                        }
                         $(item)
                             .css('color', $scope.series[index].color || colors[index])
                             .find('.md-icon')

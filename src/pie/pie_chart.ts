@@ -33,6 +33,9 @@
                 var colors           = _.map($mdColorPalette, function (palette, color) {
                     return color;
                 });
+                colors = _.filter(colors, function(color){
+                    return _.isObject($mdColorPalette[color]) && _.isObject($mdColorPalette[color][500] && _.isArray($mdColorPalette[color][500].value));
+                });                
                 var resizeTitleLabel = resizeTitleLabelUnwrap;
 
                 vm.data = vm.data || [];
@@ -208,7 +211,19 @@
                         + ($mdColorPalette[color][500].value[3] || 1) + ')';
                 }
 
+                /**
+                 * Helpful method
+                 * @private
+                 */
+                function getMaterialColor(index) {
+                    if (!colors || colors.length < 1) return null;
 
+                    if (index >= colors.length) {
+                        index = 0;
+                    }
+
+                    return materialColorToRgba(colors[index]);
+                } 
                 /**
                  * Helpful method
                  * @private
@@ -217,7 +232,7 @@
                     if (!vm.data) return;
 
                     vm.data.forEach(function (item, index) {
-                        item.color = item.color || materialColorToRgba(colors[index]);
+                        item.color = item.color || getMaterialColor(index);
                     });
                 }
             }
