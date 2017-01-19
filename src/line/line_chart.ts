@@ -113,7 +113,7 @@
                 }, true);
 
                 $scope.$on('$destroy', () => {
-                    d3.selectAll('.nvtooltip').style('opacity', 0);
+                   setTimeout(()=> {d3.selectAll('.nvtooltip').style('opacity', 0); }, 300)
                 });
 
                 function prepareData(data) {
