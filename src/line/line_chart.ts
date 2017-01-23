@@ -170,6 +170,35 @@
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
                     chartElem.datum(vm.data || []).style('height', (getHeight() - 50) + 'px').call(chart);
+                    // Handle touches for correcting tooltip position
+                    $('.line-chart svg').on('touchstart touchmove', (e) => { 
+                        setTimeout(() => {
+                            let tooltip = $('.nvtooltip'),
+                                tooltipW = tooltip.innerWidth(),
+                                bodyWidth = $('body').innerWidth(),
+                                x = e.originalEvent['touches'][0]['pageX'],
+                                y = e.originalEvent['touches'][0]['pageY'];
+
+                            tooltip.css('transform', 'translate(' 
+                                + (x + tooltipW >= bodyWidth ? (x - tooltipW) : x) + ',' 
+                                + y + ')');
+                            tooltip.css('left', 0); 
+                            tooltip.css('top', 0);
+                        }); 
+                    });
+
+                    $('.line-chart svg').on('touchstart touchend', (e) => { 
+                        let removeTooltip = () => {
+                            let tooltip = $('.nvtooltip');
+                            tooltip.css('opacity', 0);
+                        };
+
+                        removeTooltip();
+
+                        setTimeout(() => {
+                            removeTooltip();
+                        }, 500); 
+                    });
 
                     if (vm.dynamic) {
                         addZoom(chart, chartElem);
