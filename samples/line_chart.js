@@ -20,7 +20,7 @@
                 return x + ' y.';
             }
 
-            $scope.xTickValues = [2014, 2032, 2];
+            $scope.xTickValues = [2014, 2020, 2];
 
             $scope.series = [
                 {
@@ -52,6 +52,14 @@
             ];
 
             $scope.series2 = _.cloneDeep($scope.series);
+
+            $scope.update = () => {
+                $scope.xTickValues = [2014, 2020, 1];
+                $scope.series = [];
+                setTimeout(() => {
+                    $scope.series = _.cloneDeep($scope.series2);
+                });
+            }
 
             function nextStep() {
                 $scope.series.forEach(function (seria) {

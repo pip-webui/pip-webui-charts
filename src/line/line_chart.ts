@@ -94,9 +94,13 @@
                     generateParameterColor();
 
                     if (chart) {
+                         chart.xAxis
+                            .tickValues(vm.xTickValues && _.isArray(vm.xTickValues) && vm.xTickValues.length > 2 ? 
+                                d3.range(vm.xTickValues[0], vm.xTickValues[1], vm.xTickValues[2]) : null);
+
                         chartElem.datum(vm.data || []).call(chart);
                         drawEmptyState();
-
+                        
                         if (updateZoomOptions) updateZoomOptions(vm.data);
                     }
                 }, true);
