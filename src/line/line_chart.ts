@@ -21,6 +21,7 @@
                 xFormat: '=pipXFormat',
                 xTickFormat: '=pipXTickFormat',
                 yTickFormat: '=pipYTickFormat',
+                xTickValues: '=pipXTickValues',
                 dynamic: '=pipDynamic',
                 fixedHeight: '@pipDiagramHeight',
                 dynamicHeight: '@pipDynamicHeight',
@@ -127,7 +128,7 @@
 
                 var getHeight = () => {
                     if (dynamicHeight) {
-                        var heigth = Math.min(Math.max(minHeight, $element.parent().innerHeight()), maxHeight);
+                        const heigth = Math.min(Math.max(minHeight, $element.parent().innerHeight()), maxHeight);
                         return heigth;
                     } else {
                         return fixedHeight;
@@ -166,7 +167,9 @@
                     chart.xAxis
                         .tickFormat(function (d) {
                             return vm.xTickFormat ? vm.xTickFormat(d) : d;
-                        });
+                        })
+                        .tickValues(vm.xTickValues && _.isArray(vm.xTickValues) && vm.xTickValues.length > 2 ? 
+                                d3.range(vm.xTickValues[0], vm.xTickValues[1], vm.xTickValues[2]) : null);
 
                     chartElem = d3.select($element.get(0)).select('.line-chart svg');
                     chartElem.datum(vm.data || []).style('height', (getHeight() - 50) + 'px').call(chart);

@@ -2,3 +2,9 @@
 [1216/214805:ERROR:node_debugger.cc(86)] Cannot start debugger server
 [1218/182954:ERROR:tcp_listen_socket.cc(76)] Could not bind socket to 127.0.0.1:6004
 [1218/182954:ERROR:node_debugger.cc(86)] Cannot start debugger server
+[0222/121345:ERROR:file_io_win.cc(163)] CreateFile C:\Program Files (x86)\settings.dat: Отказано в доступе. (0x5)
+[0222/121345:ERROR:registration_protocol_win.cc(82)] TransactNamedPipe: Канал был закрыт. (0x6D)
+[0222/121346:ERROR:file_io_win.cc(163)] CreateFile C:\Program Files (x86)\settings.dat: Отказано в доступе. (0x5)
+[0222/124102:ERROR:file_io_win.cc(163)] CreateFile C:\Program Files (x86)\settings.dat: Отказано в доступе. (0x5)
+[0222/124102:ERROR:registration_protocol_win.cc(82)] TransactNamedPipe: Канал был закрыт. (0x6D)
+[0222/124102:ERROR:file_io_win.cc(163)] CreateFile C:\Program Files (x86)\settings.dat: Отказано в доступе. (0x5)
