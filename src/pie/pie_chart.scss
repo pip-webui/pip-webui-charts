@@ -4,10 +4,10 @@ pip-pie-chart {
     position: relative;
     .pip-empty-pie-text {
       position: absolute;
-      font-family: @font-family;
+      font-family: $font-family;
       font-size: 14px;
-      width: ~"calc(100% - 120px)";
-      top: ~"calc(50% - 15px)";
+      width: calc(100% - 120px);
+      top: calc(50% - 15px);
       left: 60px;
       text-align: center;
       color: rgba(0, 0, 0, 0.54);
@@ -37,7 +37,7 @@ pip-pie-chart {
 
     .label-total {
         transition: opacity 0.35s ease;
-        font-family: @font-family;
+        font-family: $font-family;
         font-weight: 500;
         font-style: normal;
         font-stretch: normal;
@@ -46,7 +46,7 @@ pip-pie-chart {
 
     .nv-pieLabels {
       .nv-label text {
-        font-family: @font-family;
+        font-family: $font-family;
         font-size: 14px;
         font-weight: bold;
         font-style: normal;
