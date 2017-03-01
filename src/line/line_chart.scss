@@ -123,7 +123,7 @@ pip-line-chart {
         display: block;
         position: relative;
         height: 5px;
-        width: ~"calc(100% - 50px)";
+        width: calc(100% - 50px);
         margin-left: 30px;
         background-color: rgba(0, 0, 0, 0.26);
         border-radius: 2px;
