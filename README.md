@@ -4,7 +4,39 @@
 
 Pip.WebUI.Charts module provides collection of chart controls implemented based on wonderful D3 library.
 
-Todo: add descriptions of charts and links to samples
+**Bar chart** provides displaying of chart that present grouped data with rectangular bars:
+
+<a href="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-bar-chart.png" style="border: 3px ridge #c8d2df; display: inline-block">
+    <img src="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-bar-chart.png"/>
+</a>
+
+**Line chart** provides displaying of chart which displays information as a series of data points connected by straight line segments:
+
+<a href="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-line-chart.png" style="border: 3px ridge #c8d2df; display: inline-block">
+    <img src="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-line-chart.png"/>
+</a>
+
+**Pie chart** provides displaying of circular chart which is divided into slices to illustrate numerical proportion:
+
+<a href="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-pie-chart.png" style="border: 3px ridge #c8d2df; display: inline-block">
+    <img src="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-pie-chart.png"/>
+</a>
+
+<a href="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-circle-chart.png" style="border: 3px ridge #c8d2df; display: inline-block">
+    <img src="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-circle-chart.png"/>
+</a>
+
+**Legend** provides displaying of data that chart shows by color:
+
+<a href="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-legend.png" style="border: 3px ridge #c8d2df; display: inline-block">
+    <img src="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-legend.png"/>
+</a>
+
+ <a href="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-interactive-legend.png" style="border: 3px ridge #c8d2df; display: inline-block">
+    <img src="https://github.com/pip-webui/pip-webui-charts/raw/master/doc/images/img-interactive-legend.png"/>
+</a>
+
+See online samples [here...](http://webui.pipdevs.com/pip-webui-charts/index.html#/bar)
 
 ## Learn more about the module
 
