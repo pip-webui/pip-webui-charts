@@ -175,7 +175,6 @@
         };
     }
 })();
-
 },{}],2:[function(require,module,exports){
 (function () {
     'use strict';
@@ -187,7 +186,6 @@
         'pipCharts.Templates'
     ]);
 })();
-
 },{}],3:[function(require,module,exports){
 (function () {
     'use strict';
@@ -257,7 +255,6 @@
         };
     }
 })();
-
 },{}],4:[function(require,module,exports){
 (function () {
     'use strict';
@@ -687,7 +684,6 @@
         };
     }
 })();
-
 },{}],5:[function(require,module,exports){
 (function () {
     'use strict';
@@ -871,7 +867,6 @@
         };
     }
 })();
-
 },{}],6:[function(require,module,exports){
 (function(module) {
 try {
