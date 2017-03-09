@@ -1,7 +1,7 @@
 {
     "name":  "pip-webui-charts",
     "version":  "2.0.0",
-    "author":  "Digital Living Software Corp. <www.digitallivingsoftware.com>",
+    "author":  "Conceptual Vision Consulting LLC",
     "description":  "Chart controls for Pip.WebUI",
     "contributors":  [
                          {
