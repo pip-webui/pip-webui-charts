@@ -1,7 +1,7 @@
 module.exports = {
     module: {
         name: 'pipCharts',
-        styles: 'charts',
+        styles: 'index',
         export: 'pip.charts',
         standalone: 'pip.charts'
     },

@@ -1,9 +1,9 @@
 <div >
-    <div class="chart-legend-item" ng-repeat="item in series" ng-show="item.values || item.value">
+    <div class="chart-legend-item" ng-repeat="item in $ctrl.series" ng-show="item.values || item.value">
         <md-checkbox ng-model="item.disabled"
                      ng-true-value="false"
                      ng-false-value="true"
-                     ng-if="interactive"
+                     ng-if="$ctrl.interactive"
                      aria-label="{{ item.label }}">
             <p class="legend-item-value"
                 ng-if="item.value"
@@ -13,7 +13,7 @@
             <p class="legend-item-label">{{:: item.label || item.key }}</p>
         </md-checkbox>
 
-        <div ng-if="!interactive">
+        <div ng-if="!$ctrl.interactive">
             <span class="bullet" ng-style="{'background-color': item.color}"></span>
             <span>{{:: item.label || item.key}}</span>
         </div>
