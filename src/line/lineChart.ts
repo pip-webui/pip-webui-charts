@@ -1,13 +1,4 @@
-(function () {
-    'use strict';
-
-    /**
-     * @ngdoc module
-     * @name pipLineCharts
-     *
-     * @description
-     * Line chart on top of Rickshaw charts
-     */
+{
     angular.module('pipLineCharts', [])
         .directive('pipLineChart', pipLineChart);
 
@@ -31,7 +22,7 @@
             },
             bindToController: true,
             controllerAs: 'lineChart',
-            templateUrl: 'line/line_chart.html',
+            templateUrl: 'line/lineChart.html',
             controller: function ($element, $scope, $timeout, $interval, $mdColorPalette) {
                 var vm        = this;
                 var chart     = null;
@@ -543,4 +534,4 @@
             }
         };
     }
-})();
+}
