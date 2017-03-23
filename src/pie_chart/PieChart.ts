@@ -1,6 +1,4 @@
-import {
-    IChartsUtilityService
-} from '../utility/IChartsUtilityService';
+import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
 {
     interface IPieChartBindings {
@@ -52,9 +50,11 @@ import {
             private $element: JQuery,
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
-            private pipChartsUtility: IChartsUtilityService
+            private pipChartColors: IChartColorsService
         ) {
-            this.colors = this.pipChartsUtility.generateMaterialColors();
+            "ngInject";
+
+            this.colors = this.pipChartColors.generateMaterialColors();
         }
 
         public $onInit() {
@@ -62,7 +62,7 @@ import {
             this.generateParameterColor();
             ( < any > d3.scale).paletteColors = () => {
                 return d3.scale.ordinal().range(this.colors.map((color) => {
-                    return this.pipChartsUtility.materialColorToRgba(color);
+                    return this.pipChartColors.materialColorToRgba(color);
                 }));
             };
 
@@ -231,7 +231,7 @@ import {
             if (!this.data) return;
 
             _.each(this.data, (item: any, index: number) => {
-                item.color = item.color || this.pipChartsUtility.getMaterialColor(index, this.colors);
+                item.color = item.color || this.pipChartColors.getMaterialColor(index, this.colors);
             });
         }
 
@@ -239,10 +239,11 @@ import {
 
     const PieChart: ng.IComponentOptions = {
         bindings: PieChartBindings,
-        templateUrl: 'pie/pieChart.html',
+        templateUrl: 'pie_chart/PieChart.html',
         controller: PieChartController
     }
 
-    angular.module('pipPieCharts', [])
+    angular
+        .module('pipPieCharts', [])
         .component('pipPieChart', PieChart);
 }

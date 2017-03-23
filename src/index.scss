@@ -1,10 +1,8 @@
-﻿// @file Composition of chart controls CSS styles
+﻿@import "css_light/index";
 
-@import "css_light/index";
-
-@import "bar/barChart";
-@import "line/lineChart";
-@import "pie/pieChart";
-@import "legend/legend";
+@import "bar_chart/BarChart";
+@import "line_chart/LineChart";
+@import "pie_chart/PieChart";
+@import "chart_legend/ChartLegend";
 
 

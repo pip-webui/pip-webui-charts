@@ -3,6 +3,6 @@
     'pipLineCharts',
     'pipPieCharts',
     'pipChartLegends',
-    'pipChartsUtility',
+    'pipChartColors',
     'pipCharts.Templates'
 ]);

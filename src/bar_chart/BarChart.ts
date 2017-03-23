@@ -1,6 +1,4 @@
-import {
-    IChartsUtilityService
-} from '../utility/IChartsUtilityService';
+import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
 {
     interface IBarChartBindings {
@@ -45,9 +43,11 @@ import {
             private $element: JQuery,
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
-            private pipChartsUtility: IChartsUtilityService
+            private pipChartColors: IChartColorsService
         ) {
-            this.colors = this.pipChartsUtility.generateMaterialColors();
+            "ngInject";
+
+            this.colors = this.pipChartColors.generateMaterialColors();
             $scope.$watch('$ctrl.legend', (updatedLegend) => {
                 if (!updatedLegend) return;
 
@@ -64,7 +64,7 @@ import {
             this.generateParameterColor();
             ( < any > d3.scale).paletteColors = () => {
                 return d3.scale.ordinal().range(this.colors.map((color) => {
-                    return this.pipChartsUtility.materialColorToRgba(color);
+                    return this.pipChartColors.materialColorToRgba(color);
                 }));
             };
 
@@ -116,7 +116,7 @@ import {
                     .duration(0)
                     .height(this.height)
                     .color((d) => {
-                        return this.data[d.series].color || this.pipChartsUtility.materialColorToRgba(this.colors[d.series]);
+                        return this.data[d.series].color || this.pipChartColors.materialColorToRgba(this.colors[d.series]);
                     });
 
                 this.chart.tooltip.enabled(false);
@@ -228,7 +228,7 @@ import {
 
             _.each(this.data, (item: any, index: number) => {
                 if (item.values[0]) {
-                    item.values[0].color = item.values[0].color || this.pipChartsUtility.getMaterialColor(index, this.colors);
+                    item.values[0].color = item.values[0].color || this.pipChartColors.getMaterialColor(index, this.colors);
                     item.color = item.values[0].color;
                 }
             });
@@ -238,10 +238,11 @@ import {
 
     const BarChart: ng.IComponentOptions = {
         bindings: BarChartBindings,
-        templateUrl: 'bar/barChart.html',
+        templateUrl: 'bar_chart/BarChart.html',
         controller: BarChartController
     }
 
-    angular.module('pipBarCharts', [])
+    angular
+        .module('pipBarCharts', [])
         .component('pipBarChart', BarChart);
 }

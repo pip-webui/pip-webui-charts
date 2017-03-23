@@ -1,6 +1,4 @@
-import {
-    IChartsUtilityService
-} from '../utility/IChartsUtilityService';
+import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
 {
     interface ILineChartBindings {
@@ -85,9 +83,11 @@ import {
             private $element: JQuery,
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
-            private pipChartsUtility: IChartsUtilityService
+            private pipChartColors: IChartColorsService
         ) {
-            this.colors = this.pipChartsUtility.generateMaterialColors();
+            "ngInject";
+
+            this.colors = this.pipChartColors.generateMaterialColors();
 
             $scope.$watch('$ctrl.legend', (updatedLegend) => {
                 this.data = this.prepareData(updatedLegend);
@@ -112,7 +112,7 @@ import {
 
             ( < any > d3.scale).paletteColors = () => {
                 return d3.scale.ordinal().range(this.colors.map((color) => {
-                    return this.pipChartsUtility.materialColorToRgba(color);
+                    return this.pipChartColors.materialColorToRgba(color);
                 }));
             };
 
@@ -361,7 +361,7 @@ import {
             if (!this.data) return;
 
             _.each(this.data, (item, index: number) => {
-                item.color = item.color || this.pipChartsUtility.getMaterialColor(index, this.colors);
+                item.color = item.color || this.pipChartColors.getMaterialColor(index, this.colors);
             });
         }
 
@@ -595,10 +595,11 @@ import {
 
     const LineChart: ng.IComponentOptions = {
         bindings: LineChartBindings,
-        templateUrl: 'line/lineChart.html',
+        templateUrl: 'line_chart/LineChart.html',
         controller: LineChartController
     }
 
-    angular.module('pipLineCharts', [])
+    angular
+        .module('pipLineCharts', [])
         .component('pipLineChart', LineChart);
 }
