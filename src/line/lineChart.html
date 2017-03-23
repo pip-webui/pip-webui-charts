@@ -1,17 +1,17 @@
 <div class="line-chart" flex="auto" layout="column">
-    <svg class="flex-auto" ng-class="{'visible-x-axis': lineChart.isVisibleX(), 'visible-y-axis': lineChart.isVisibleY()}">
+    <svg class="flex-auto" ng-class="{'visible-x-axis': $ctrl.showXAxis, 'visible-y-axis': $ctrl.showYAxis}">
     </svg>
     <div class="scroll-container">
         <div class="visual-scroll">
             <div class="scrolled-block"></div>
         </div>
     </div>
-    <md-button class="md-fab md-mini minus-button" ng-click="lineChart.zoomOut()">
+    <md-button class="md-fab md-mini minus-button" ng-click="$ctrl.zoomOut()">
         <md-icon md-svg-icon="icons:minus-circle"></md-icon>
     </md-button>
-    <md-button class="md-fab md-mini plus-button" ng-click="lineChart.zoomIn()">
+    <md-button class="md-fab md-mini plus-button" ng-click="$ctrl.zoomIn()">
         <md-icon md-svg-icon="icons:plus-circle"></md-icon>
     </md-button>
 </div>
 
-<pip-chart-legend pip-series="lineChart.legend" pip-interactive="lineChart.interactiveLegend"></pip-chart-legend>
+<pip-chart-legend pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>
