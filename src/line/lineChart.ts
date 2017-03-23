@@ -123,20 +123,21 @@ import {
             this.fixedHeight = changes.fixedHeight ? changes.fixedHeight.currentValue : this.HEIGHT;
             this.minHeight = changes.minHeight ? changes.minHeight.currentValue : this.HEIGHT;
             this.maxHeight = changes.maxHeight ? changes.maxHeight.currentValue : this.HEIGHT;
-            this.dynamicHeight = changes.dynamicHeight ? changes.dynamicHeight.currentValue : false;
+            this.dynamicHeight = changes.dynamicHeight ? changes.dynamicHeight.currentValue : this.dynamicHeight;
 
-            this.showXAxis = changes.showXAxis ? changes.showXAxis.currentValue : true;
-            this.showYAxis = changes.showYAxis ? changes.showYAxis.currentValue : true;
-            this.dynamic = changes.dynamic ? changes.dynamic.currentValue : false;
-            this.interactiveLegend = changes.interactiveLegend ? changes.interactiveLegend.currentValue : false;
+            this.showXAxis = changes.showXAxis ? changes.showXAxis.currentValue : this.showXAxis;
+            this.showYAxis = changes.showYAxis ? changes.showYAxis.currentValue : this.showYAxis;
+            this.dynamic = changes.dynamic ? changes.dynamic.currentValue : this.dynamic;
+            this.interactiveLegend = changes.interactiveLegend ? changes.interactiveLegend.currentValue : this.interactiveLegend;
 
-            this.xFormat = changes.xFormat ? changes.xFormat.currentValue : null;
-            this.xTickFormat = changes.xTickFormat ? changes.xTickFormat.currentValue : null;
-            this.yTickFormat = changes.yTickFormat ? changes.yTickFormat.currentValue : null;
+            this.xFormat = changes.xFormat ? changes.xFormat.currentValue : this.xFormat;
+            this.xTickFormat = changes.xTickFormat ? changes.xTickFormat.currentValue : this.xTickFormat;
+            this.yTickFormat = changes.yTickFormat ? changes.yTickFormat.currentValue : this.yTickFormat;
 
             if (changes.xTickValues && changes.xTickValues.currentValue !== changes.xTickValues.previousValue) {
                 this.xTickValues = changes.xTickValues.currentValue;
                 this.updateXTickValues();
+                if (this.chartElem && this.chart) this.chartElem.datum(this.data || []).call(this.chart);
             }
 
             if (changes.series && changes.series.currentValue !== changes.series.previousValue) {
@@ -338,7 +339,7 @@ import {
         private updateScroll(domains, boundary) {
             const bDiff = boundary[1] - boundary[0],
                 domDiff = domains[1] - domains[0],
-                isEqual = (domains[1] - domains[0]) / bDiff === 1;
+                isEqual = domDiff / bDiff === 1;
 
             $(this.$element[0]).find('.visual-scroll')
                 .css('opacity', function () {
@@ -348,10 +349,10 @@ import {
             if (isEqual) return;
 
             $(this.$element[0]).find('.scrolled-block')
-                .css('left', function () {
-                    return domains[0] / bDiff * 100 + '%';
+                .css('left', () => {
+                    return (domains[0] - boundary[0]) / bDiff * 100 + '%';
                 })
-                .css('width', function () {
+                .css('width', () => {
                     return domDiff / bDiff * 100 + '%';
                 });
         }
@@ -365,7 +366,7 @@ import {
         }
 
         private addZoom(chart, svg) {
-            // scaleExtent
+            // Scale Extent
             const scaleExtent = 4;
 
             // Parameters

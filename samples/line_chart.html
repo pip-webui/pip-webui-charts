@@ -2,15 +2,17 @@
 
 <h4>Static</h4>
 
+<p>Try to switch visibility of axises and. Also try to add new data and update x axis's labels:</p>
+
 <md-switch ng-model="showX">Show X Axis</md-switch>
 <md-switch ng-model="showY">Show Y Axis</md-switch>
+<md-button ng-click="addData()" class="md-raised">Add data to end</md-button>
+<md-button ng-click="update()" class="md-raised">Update X axis labels</md-button>
 
 <pip-line-chart pip-series="series" pip-x-format="formatX" pip-y-axis="showY" pip-x-axis="showX"
         pip-x-tick-values="xTickValues"
         pip-inter-legend="true" pip-diagram-height="540" pip-dynamic-height="true" pip-min-height="270" pip-max-height="400">
 </pip-line-chart>
-
-<md-button ng-click="update()">update </md-button>
 
 <h4 style="margin-top: 32px">Empty state</h4>
 

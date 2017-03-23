@@ -54,11 +54,11 @@
             $scope.series2 = _.cloneDeep($scope.series);
 
             $scope.update = () => {
-                $scope.xTickValues = [2014, 2020, 1];
-                $scope.series = [];
-                setTimeout(() => {
-                    $scope.series = _.cloneDeep($scope.series2);
-                });
+                $scope.xTickValues = [2014, startYear - 2, 2];
+            }
+
+            $scope.addData = () => {
+                nextStep();
             }
 
             function nextStep() {
@@ -66,9 +66,9 @@
                     seria.values.push({value: Math.random() * 3000, x: new Date(startYear, 0, 0, 0)});
                 });
 
-                $scope.series2.forEach(function (seria) {
-                    seria.values.push({value: Math.random() * 3000, x: new Date(startYear, 0, 0, 0)});
-                });
+                //$scope.series2.forEach(function (seria) {
+                   // seria.values.push({value: Math.random() * 3000, x: new Date(startYear, 0, 0, 0)});
+                //});
                 startYear++;
             }
 
