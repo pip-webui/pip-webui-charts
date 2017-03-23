@@ -1,12 +1,12 @@
-import {
-    IChartsUtilityService
-} from './IChartsUtilityService';
+import { IChartColorsService } from './IChartColorsService';
 
 {
-    class ChartsUtilityService implements IChartsUtilityService {
+    class ChartColorsService implements IChartColorsService {
         constructor(
             private $mdColorPalette: angular.material.IColorPalette
-        ) { }
+        ) { 
+            "ngInject";
+        }
 
         public getMaterialColor(index: number, colors: string[]): string {
             if (!colors || colors.length < 1) return null;
@@ -38,6 +38,6 @@ import {
     }
 
     angular
-        .module('pipChartsUtility', [])
-        .service('pipChartsUtility', ChartsUtilityService);
+        .module('pipChartColors', [])
+        .service('pipChartColors', ChartColorsService);
 }

@@ -1,6 +1,4 @@
-import {
-    IChartsUtilityService
-} from '../utility/IChartsUtilityService';
+import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
 {
     interface IChartLegendBindings {
@@ -32,9 +30,10 @@ import {
             private $element: JQuery,
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
-            private pipChartsUtility: IChartsUtilityService
+            private pipChartColors: IChartColorsService
         ) {
-            this.colors = this.pipChartsUtility.generateMaterialColors();
+            "ngInject";
+            this.colors = this.pipChartColors.generateMaterialColors();
         }
 
         public $onInit() {
@@ -93,7 +92,7 @@ import {
             if (!this.series) return;
 
             _.each(this.series, (item: any, index: number) => {
-                const materialColor = this.pipChartsUtility.getMaterialColor(index, this.colors);
+                const materialColor = this.pipChartColors.getMaterialColor(index, this.colors);
                 item.color = item.color || (item.values && item.values[0] && item.values[0].color ? item.values[0].color : materialColor);
                 item.disabled = item.disabled || false;
             });
@@ -102,10 +101,11 @@ import {
 
     const ChartLegend: ng.IComponentOptions = {
         bindings: ChartLegendBindings,
-        templateUrl: 'legend/interactiveLegend.html',
+        templateUrl: 'chart_legend/ChartInteractiveLegend.html',
         controller: ChartLegendController
     }
 
-    angular.module('pipChartLegends', [])
+    angular
+        .module('pipChartLegends', [])
         .component('pipChartLegend', ChartLegend);
 }
