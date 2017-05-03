@@ -1,32 +1,30 @@
 {
-    "name":  "pip-webui-charts",
-    "version":  "2.0.2",
-    "author":  "Conceptual Vision Consulting LLC",
-    "description":  "Chart controls for Pip.WebUI",
-    "contributors":  [
-                         {
-                             "name":  "Sergey Seroukhov",
-                             "email":  "seroukhov@gmail.com"
-                         },
-                         {
-                             "name":  "Alexey Dvoikin",
-                             "email":  "94dvoikin@gmail.com"
-                         }
-                     ],
-    "keywords":  [
-                     "pip",
-                     "webui",
-                     "framework",
-                     "controls",
-                     "charts"
-                 ],
-    "noAnalyze":  true,
-    "license":  "MIT",
-    "private":  false,
-    "dependencies":  {
-
-                     },
-    "devDependencies":  {
-                            "pip-webui-tasks":  "^1.8.0"
-                        }
+  "name": "pip-webui-charts",
+  "version": "2.1.0",
+  "author": "Conceptual Vision Consulting LLC",
+  "description": "Chart controls for Pip.WebUI",
+  "contributors": [
+    {
+      "name": "Sergey Seroukhov",
+      "email": "seroukhov@gmail.com"
+    },
+    {
+      "name": "Alexey Dvoikin",
+      "email": "94dvoikin@gmail.com"
+    }
+  ],
+  "keywords": [
+    "pip",
+    "webui",
+    "framework",
+    "controls",
+    "charts"
+  ],
+  "noAnalyze": true,
+  "license": "MIT",
+  "private": false,
+  "dependencies": {},
+  "devDependencies": {
+    "pip-webui-tasks": "^1.8.0"
+  }
 }
