@@ -194,7 +194,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipBarCharts', [])
         .component('pipBarChart', BarChart);
 }
-
 },{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -235,11 +234,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipChartColors', [])
         .service('pipChartColors', ChartColorsService);
 }
-
 },{}],3:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-
 },{}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -332,7 +329,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipChartLegends', [])
         .component('pipChartLegend', ChartLegend);
 }
-
 },{}],5:[function(require,module,exports){
 angular.module('pipCharts', [
     'pipBarCharts',
@@ -342,7 +338,6 @@ angular.module('pipCharts', [
     'pipChartColors',
     'pipCharts.Templates'
 ]);
-
 },{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -806,7 +801,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipLineCharts', [])
         .component('pipLineChart', LineChart);
 }
-
 },{}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -1008,8 +1002,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
         .module('pipPieCharts', [])
         .component('pipPieChart', PieChart);
 }
-
 },{}],8:[function(require,module,exports){
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('bar_chart/BarChart.html',
+    '<div class="bar-chart">\n' +
+    '    <svg ></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
+}]);
+})();
+
 (function(module) {
 try {
   module = angular.module('pipCharts.Templates');
@@ -1039,22 +1048,6 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</div>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('bar_chart/BarChart.html',
-    '<div class="bar-chart">\n' +
-    '    <svg ></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
