@@ -183,7 +183,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                         top: 20,
                         right: 20,
                         bottom: 30,
-                        left: 30
+                        left: 50
                     })
                     .x((d) => {
                         return (d !== undefined && d.x !== undefined) ? (this.xFormat ? this.xFormat(d.x) : d.x) : d;
@@ -199,6 +199,9 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                     .color((d) => {
                         return d.color || ( < any > d3.scale).paletteColors().range();
                     });
+                if (this.onlyZeroY()) {
+                    this.chart.yDomain([0, 5]);
+                }
 
                 this.chart.tooltip.enabled(false);
                 this.chart.noData('There is no data right now...');
@@ -262,6 +265,16 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
             }, () => {
                 this.drawEmptyState();
             });
+        }
+
+        private onlyZeroY() {
+            for (let seria in this.data) {
+                for (let v in this.data[seria]['values']) {
+                    if (this.data[seria]['values'][v]['value'] != 0) return false;
+                };
+            };
+
+            return true;
         }
 
         private updateXTickValues() {

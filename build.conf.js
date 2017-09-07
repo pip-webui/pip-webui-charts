@@ -28,6 +28,7 @@ module.exports = {
         ]
     },
     samples: {
+        https: false,
         port: 8120
     },
     api: {
