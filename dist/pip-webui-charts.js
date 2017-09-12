@@ -463,7 +463,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     top: 20,
                     right: 20,
                     bottom: 30,
-                    left: 50
+                    left: 80
                 })
                     .x(function (d) {
                     return (d !== undefined && d.x !== undefined) ? (_this.xFormat ? _this.xFormat(d.x) : d.x) : d;
@@ -486,7 +486,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 _this.chart.noData('There is no data right now...');
                 _this.chart.yAxis
                     .tickFormat(function (d) {
-                    return _this.yTickFormat ? _this.yTickFormat(d) : d;
+                    var y = _this.yTickFormat ? _this.yTickFormat(d) : d;
+                    return _this.clipYTick(y);
                 });
                 _this.chart.xAxis
                     .tickFormat(function (d) {
@@ -528,6 +529,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
             }, function () {
                 _this.drawEmptyState();
             });
+        };
+        LineChartController.prototype.clipYTick = function (string) {
+            return string.length > 12 ? (string.substr(0, 10) + '..') : string;
         };
         LineChartController.prototype.onlyZeroY = function () {
             for (var seria in this.data) {
@@ -1072,22 +1076,6 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie_chart/PieChart.html',
-    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line_chart/LineChart.html',
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': $ctrl.showXAxis, \'visible-y-axis\': $ctrl.showYAxis}">\n' +
@@ -1107,6 +1095,22 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '<pip-chart-legend pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie_chart/PieChart.html',
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
 }]);
 })();
 
