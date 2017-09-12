@@ -183,7 +183,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                         top: 20,
                         right: 20,
                         bottom: 30,
-                        left: 50
+                        left: 80
                     })
                     .x((d) => {
                         return (d !== undefined && d.x !== undefined) ? (this.xFormat ? this.xFormat(d.x) : d.x) : d;
@@ -207,8 +207,10 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                 this.chart.noData('There is no data right now...');
 
                 this.chart.yAxis
-                    .tickFormat((d) => {
-                        return this.yTickFormat ? this.yTickFormat(d) : d;
+                    .tickFormat((d: any) => {
+                        let y = this.yTickFormat ? this.yTickFormat(d) : d;
+        
+                        return this.clipYTick(y);
                     });
 
                 this.chart.xAxis
@@ -265,6 +267,10 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
             }, () => {
                 this.drawEmptyState();
             });
+        }
+
+        private clipYTick(string: String): any {
+            return string.length > 12 ? (string.substr(0, 10) + '..') : string;
         }
 
         private onlyZeroY() {
