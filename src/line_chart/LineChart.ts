@@ -82,6 +82,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
         constructor(
             private $element: JQuery,
             private $scope: ng.IScope,
+            private $rootScope: ng.IRootScopeService,
             private $timeout: ng.ITimeoutService,
             private pipChartColors: IChartColorsService
         ) {
@@ -259,8 +260,9 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                     this.onResize();
                 });
 
-                this.$scope.$on('pipMainResized', () => {
+                this.$rootScope.$on('pipMainResized', () => {
                     this.onResize();
+                    console.log('resized');
                 });
 
                 return this.chart;
