@@ -363,12 +363,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
         return LineChartBindingsChanges;
     }());
     var LineChartController = (function () {
-        LineChartController.$inject = ['$element', '$scope', '$timeout', 'pipChartColors'];
-        function LineChartController($element, $scope, $timeout, pipChartColors) {
+        LineChartController.$inject = ['$element', '$scope', '$rootScope', '$timeout', 'pipChartColors'];
+        function LineChartController($element, $scope, $rootScope, $timeout, pipChartColors) {
             "ngInject";
             var _this = this;
             this.$element = $element;
             this.$scope = $scope;
+            this.$rootScope = $rootScope;
             this.$timeout = $timeout;
             this.pipChartColors = pipChartColors;
             this.HEIGHT = 270;
@@ -522,8 +523,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 nv.utils.windowResize(function () {
                     _this.onResize();
                 });
-                _this.$scope.$on('pipMainResized', function () {
+                _this.$rootScope.$on('pipMainResized', function () {
                     _this.onResize();
+                    console.log('resized');
                 });
                 return _this.chart;
             }, function () {
