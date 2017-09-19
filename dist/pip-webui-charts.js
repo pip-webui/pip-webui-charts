@@ -525,7 +525,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 });
                 _this.$rootScope.$on('pipMainResized', function () {
                     _this.onResize();
-                    console.log('resized');
+                });
+                _this.$rootScope.$on('pipAuxPanelOpened', function () {
+                    _this.onResize();
+                });
+                _this.$rootScope.$on('pipAuxPanelClosed', function () {
+                    _this.onResize();
                 });
                 return _this.chart;
             }, function () {
