@@ -262,7 +262,14 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
                 this.$rootScope.$on('pipMainResized', () => {
                     this.onResize();
-                    console.log('resized');
+                });
+
+                this.$rootScope.$on('pipAuxPanelOpened', () => {
+                    this.onResize();
+                });
+
+                this.$rootScope.$on('pipAuxPanelClosed', () => {
+                    this.onResize();
                 });
 
                 return this.chart;
