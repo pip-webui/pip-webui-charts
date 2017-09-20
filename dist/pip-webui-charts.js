@@ -527,10 +527,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     _this.onResize();
                 });
                 _this.$rootScope.$on('pipAuxPanelOpened', function () {
-                    _this.onResize();
+                    _this.$timeout(function () {
+                        _this.onResize();
+                    }, 1500);
                 });
                 _this.$rootScope.$on('pipAuxPanelClosed', function () {
-                    _this.onResize();
+                    _this.$timeout(function () {
+                        _this.onResize();
+                    }, 1500);
                 });
                 return _this.chart;
             }, function () {
