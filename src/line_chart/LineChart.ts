@@ -38,20 +38,20 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
     class LineChartBindingsChanges implements ng.IOnChangesObject, ILineChartBindings {
         [key: string]: any;
 
-        fixedHeight: ng.IChangesObject < number > ;
-        dynamicHeight: ng.IChangesObject < boolean > ;
-        minHeight: ng.IChangesObject < number > ;
-        maxHeight: ng.IChangesObject < number > ;
+        fixedHeight: ng.IChangesObject<number>;
+        dynamicHeight: ng.IChangesObject<boolean>;
+        minHeight: ng.IChangesObject<number>;
+        maxHeight: ng.IChangesObject<number>;
 
-        series: ng.IChangesObject < any > ;
-        showYAxis: ng.IChangesObject < boolean > ;
-        showXAxis: ng.IChangesObject < boolean > ;
-        xFormat: ng.IChangesObject < any > ;
-        xTickFormat: ng.IChangesObject < any > ;
-        yTickFormat: ng.IChangesObject < any > ;
-        xTickValues: ng.IChangesObject < any > ;
-        dynamic: ng.IChangesObject < boolean > ;
-        interactiveLegend: ng.IChangesObject < boolean > ;
+        series: ng.IChangesObject<any>;
+        showYAxis: ng.IChangesObject<boolean>;
+        showXAxis: ng.IChangesObject<boolean>;
+        xFormat: ng.IChangesObject<any>;
+        xTickFormat: ng.IChangesObject<any>;
+        yTickFormat: ng.IChangesObject<any>;
+        xTickValues: ng.IChangesObject<any>;
+        dynamic: ng.IChangesObject<boolean>;
+        interactiveLegend: ng.IChangesObject<boolean>;
     }
 
     class LineChartController implements ng.IController, ILineChartBindings {
@@ -61,7 +61,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
         private setZoom: Function = null;
         private updateZoomOptions: Function = null;
         private colors: string[];
-        
+
         public fixedHeight: number = this.HEIGHT;
         public dynamicHeight: boolean = false;
         public minHeight: number = this.HEIGHT;
@@ -111,7 +111,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
             this.generateParameterColor();
 
-            ( < any > d3.scale).paletteColors = () => {
+            (<any>d3.scale).paletteColors = () => {
                 return d3.scale.ordinal().range(this.colors.map((color) => {
                     return this.pipChartColors.materialColorToRgba(color);
                 }));
@@ -198,7 +198,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                     .showYAxis(true)
                     .showLegend(false)
                     .color((d) => {
-                        return d.color || ( < any > d3.scale).paletteColors().range();
+                        return d.color || (<any>d3.scale).paletteColors().range();
                     });
                 if (this.onlyZeroY()) {
                     this.chart.yDomain([0, 5]);
@@ -210,7 +210,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                 this.chart.yAxis
                     .tickFormat((d: any) => {
                         let y = this.yTickFormat ? this.yTickFormat(d) : d;
-        
+
                         return this.clipYTick(y);
                     });
 
@@ -265,11 +265,15 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                 });
 
                 this.$rootScope.$on('pipAuxPanelOpened', () => {
-                    this.onResize();
+                    this.$timeout(() => {
+                        this.onResize();
+                    }, 1500);
                 });
 
                 this.$rootScope.$on('pipAuxPanelClosed', () => {
-                    this.onResize();
+                    this.$timeout(() => {
+                        this.onResize();
+                    }, 1500);
                 });
 
                 return this.chart;
@@ -486,11 +490,11 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
             // Zoom event handler
             const zoomed = () => {
-                if (( < any > d3.event).scale === 1) {
+                if ((<any>d3.event).scale === 1) {
                     unzoomed();
                     updateChart();
                 } else {
-                    xDomain(fixDomain(xScale.domain(), x_boundary, ( < any > d3.event).scale, ( < any > d3.event).translate));
+                    xDomain(fixDomain(xScale.domain(), x_boundary, (<any>d3.event).scale, (<any>d3.event).translate));
                     redraw();
                 }
 
@@ -541,7 +545,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
             }
 
             const keypress = () => {
-                switch (( < any > d3.event).keyCode) {
+                switch ((<any>d3.event).keyCode) {
                     case 39:
                         step('right');
                         break;
@@ -581,7 +585,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                 .attr('focusable', false)
                 .style('outline', 'none')
                 .on('keydown', keypress)
-                .on('focus', () => {});
+                .on('focus', () => { });
 
             const getXMinMax = (data) => {
                 let maxVal, minVal = null;
