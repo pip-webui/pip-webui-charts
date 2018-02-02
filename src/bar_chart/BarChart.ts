@@ -20,10 +20,10 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
     class BarChartBindingsChanges implements IBarChartBindings, ng.IOnChangesObject {
         [key: string]: any;
 
-        series: ng.IChangesObject < any > ;
-        xTickFormat: ng.IChangesObject < any > ;
-        yTickFormat: ng.IChangesObject < any > ;
-        interactiveLegend: ng.IChangesObject < boolean > ;
+        series: ng.IChangesObject<any>;
+        xTickFormat: ng.IChangesObject<any>;
+        yTickFormat: ng.IChangesObject<any>;
+        interactiveLegend: ng.IChangesObject<boolean>;
     }
 
     class BarChartController implements ng.IController, IBarChartBindings {
@@ -42,6 +42,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
         constructor(
             private $element: JQuery,
             private $scope: ng.IScope,
+            private $rootScope: ng.IRootScopeService,
             private $timeout: ng.ITimeoutService,
             private pipChartColors: IChartColorsService
         ) {
@@ -62,7 +63,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
             this.data = this.prepareData(this.series);
             this.legend = _.clone(this.series);
             this.generateParameterColor();
-            ( < any > d3.scale).paletteColors = () => {
+            (<any>d3.scale).paletteColors = () => {
                 return d3.scale.ordinal().range(this.colors.map((color) => {
                     return this.pipChartColors.materialColorToRgba(color);
                 }));
@@ -112,7 +113,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                     .staggerLabels(true)
                     .showXAxis(true)
                     .showYAxis(true)
-                    .valueFormat( < any > d3.format('d'))
+                    .valueFormat(<any>d3.format('d'))
                     .duration(0)
                     .height(this.height)
                     .color((d) => {
@@ -132,16 +133,36 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                         return this.xTickFormat ? this.xTickFormat(d) : d;
                     });
 
-                this.chartElem = < any > d3.select(this.$element.get(0))
+                this.chartElem = <any>d3.select(this.$element.get(0))
                     .select('.bar-chart svg')
                     .datum(this.data)
-                    .style('height', '285px')
+                    .style('height', '305px')
                     .call(this.chart);
 
+                // nv.utils.windowResize(() => {
+                //     this.chart.update();
+                //     this.configBarWidthAndLabel(0);
+                //     this.drawEmptyState();
+                // });
+
                 nv.utils.windowResize(() => {
-                    this.chart.update();
-                    this.configBarWidthAndLabel(0);
-                    this.drawEmptyState();
+                    this.onResize();
+                });
+
+                this.$rootScope.$on('pipMainResized', () => {
+                    this.onResize();
+                });
+
+                this.$rootScope.$on('pipAuxPanelOpened', () => {
+                    this.$timeout(() => {
+                        this.onResize();
+                    }, 1500);
+                });
+
+                this.$rootScope.$on('pipAuxPanelClosed', () => {
+                    this.$timeout(() => {
+                        this.onResize();
+                    }, 1500);
                 });
 
                 return this.chart;
@@ -151,6 +172,12 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                 }, 0);
                 this.drawEmptyState();
             });
+        }
+
+        private onResize() {
+            this.chart.update();
+            this.configBarWidthAndLabel(0);
+            this.drawEmptyState();
         }
 
         private prepareData(data): any {
@@ -196,7 +223,7 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
         private configBarWidthAndLabel(timeout: number = 1000) {
             const labels = this.$element.find('.nv-bar text'),
                 chartBars = this.$element.find('.nv-bar'),
-                parentHeight = ( < any > this.$element.find('.nvd3-svg')[0]).getBBox().height;
+                parentHeight = (<any>this.$element.find('.nvd3-svg')[0]).getBBox().height;
 
             d3.select(this.$element.find('.bar-chart')[0]).classed('visible', true);
 

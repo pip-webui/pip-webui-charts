@@ -14,12 +14,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
         return BarChartBindingsChanges;
     }());
     var BarChartController = (function () {
-        BarChartController.$inject = ['$element', '$scope', '$timeout', 'pipChartColors'];
-        function BarChartController($element, $scope, $timeout, pipChartColors) {
+        BarChartController.$inject = ['$element', '$scope', '$rootScope', '$timeout', 'pipChartColors'];
+        function BarChartController($element, $scope, $rootScope, $timeout, pipChartColors) {
             "ngInject";
             var _this = this;
             this.$element = $element;
             this.$scope = $scope;
+            this.$rootScope = $rootScope;
             this.$timeout = $timeout;
             this.pipChartColors = pipChartColors;
             this.chart = null;
@@ -103,12 +104,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 _this.chartElem = d3.select(_this.$element.get(0))
                     .select('.bar-chart svg')
                     .datum(_this.data)
-                    .style('height', '285px')
+                    .style('height', '305px')
                     .call(_this.chart);
                 nv.utils.windowResize(function () {
-                    _this.chart.update();
-                    _this.configBarWidthAndLabel(0);
-                    _this.drawEmptyState();
+                    _this.onResize();
+                });
+                _this.$rootScope.$on('pipMainResized', function () {
+                    _this.onResize();
+                });
+                _this.$rootScope.$on('pipAuxPanelOpened', function () {
+                    _this.$timeout(function () {
+                        _this.onResize();
+                    }, 1500);
+                });
+                _this.$rootScope.$on('pipAuxPanelClosed', function () {
+                    _this.$timeout(function () {
+                        _this.onResize();
+                    }, 1500);
                 });
                 return _this.chart;
             }, function () {
@@ -117,6 +129,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 }, 0);
                 _this.drawEmptyState();
             });
+        };
+        BarChartController.prototype.onResize = function () {
+            this.chart.update();
+            this.configBarWidthAndLabel(0);
+            this.drawEmptyState();
         };
         BarChartController.prototype.prepareData = function (data) {
             var result = [];
@@ -1087,22 +1104,6 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('pie_chart/PieChart.html',
-    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
-    '    <svg class="flex-auto"></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('line_chart/LineChart.html',
     '<div class="line-chart" flex="auto" layout="column">\n' +
     '    <svg class="flex-auto" ng-class="{\'visible-x-axis\': $ctrl.showXAxis, \'visible-y-axis\': $ctrl.showYAxis}">\n' +
@@ -1122,6 +1123,22 @@ module.run(['$templateCache', function($templateCache) {
     '\n' +
     '<pip-chart-legend pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>\n' +
     '');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('pie_chart/PieChart.html',
+    '<div class="pie-chart" class="layout-column flex-auto" ng-class="{\'circle\': !$ctrl.donut}">\n' +
+    '    <svg class="flex-auto"></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend pip-series="$ctrl.data" pip-interactive="false" ng-if="$ctrl.legend"></pip-chart-legend>');
 }]);
 })();
 
