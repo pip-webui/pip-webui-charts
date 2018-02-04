@@ -39,6 +39,9 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
         private colors: string[];
         private height: number = 270;
 
+        private spaceAfterBar: number = 15;
+        private spaceAfterMultiBar: number = 1;
+
         constructor(
             private $element: JQuery,
             private $scope: ng.IScope,
@@ -146,30 +149,34 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
                 // });
 
                 nv.utils.windowResize(() => {
-                    this.onResize();
+                    this.$timeout(() => {
+                        this.onResize();
+                    }, 100);
                 });
 
                 this.$rootScope.$on('pipMainResized', () => {
-                    this.onResize();
+                    this.$timeout(() => {
+                        this.onResize();
+                    }, 1500);
                 });
 
                 this.$rootScope.$on('pipAuxPanelOpened', () => {
                     this.$timeout(() => {
                         this.onResize();
-                    }, 1500);
+                    }, 100);
                 });
 
                 this.$rootScope.$on('pipAuxPanelClosed', () => {
                     this.$timeout(() => {
                         this.onResize();
-                    }, 1500);
+                    }, 100);
                 });
 
                 return this.chart;
             }, () => {
                 this.$timeout(() => {
-                    this.configBarWidthAndLabel();
-                }, 0);
+                    this.configBarWidthAndLabel(0);
+                }, 1000);
                 this.drawEmptyState();
             });
         }
@@ -220,6 +227,20 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
             }
         }
 
+        private getGroupSize(): number {
+            let n: number = 1;
+
+            for (let i = 0; i <this.data.length; i ++) {
+                if (this.data[i] && this.data[i].values && this.data[i].values.length > 0) {
+                    if (this.data[i].values.length > n) {
+                        n = this.data[i].values.length;
+                    }
+                }
+            }
+
+            return n;
+        }
+
         private configBarWidthAndLabel(timeout: number = 1000) {
             const labels = this.$element.find('.nv-bar text'),
                 chartBars = this.$element.find('.nv-bar'),
@@ -227,26 +248,30 @@ import { IChartColorsService } from '../chart_colors/IChartColorsService';
 
             d3.select(this.$element.find('.bar-chart')[0]).classed('visible', true);
 
+            let groupSize = this.getGroupSize();
+            let space: number = groupSize == 1 ? this.spaceAfterBar : this.spaceAfterMultiBar;
+            let correction = groupSize == 1 ? 0 : this.spaceAfterMultiBar;
+
             _.each(chartBars, (item: EventTarget, index: number) => {
                 const barHeight = Number(d3.select(item).select('rect').attr('height')),
-                    barWidth = Number(d3.select(item).select('rect').attr('width')),
+                    barWidth = Number(d3.select(item).select('rect').attr('width'))/groupSize - correction,
                     element = d3.select(item),
                     x = d3.transform(element.attr('transform')).translate[0],
                     y = d3.transform(element.attr('transform')).translate[1];
 
                 element
-                    .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + (this.height - 20) + ')')
+                    .attr('transform', 'translate(' + Number(x + index * (barWidth + space)) + ', ' + (this.height - 20) + ')')
                     .select('rect').attr('height', 0);
 
                 element
                     .transition()
                     .duration(timeout)
-                    .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + y + ')')
+                    .attr('transform', 'translate(' + Number(x + index * (barWidth + space)) + ', ' + y + ')')
                     .select('rect').attr('height', barHeight);
 
                 d3.select(labels[index])
                     .attr('dy', barHeight / 2 + 10)
-                    .attr('x', barWidth / 2);
+                    .attr('x', barWidth * groupSize  / 2);
             });
         }
 

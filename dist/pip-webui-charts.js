@@ -25,6 +25,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
             this.pipChartColors = pipChartColors;
             this.chart = null;
             this.height = 270;
+            this.spaceAfterBar = 15;
+            this.spaceAfterMultiBar = 1;
             this.colors = this.pipChartColors.generateMaterialColors();
             $scope.$watch('$ctrl.legend', function (updatedLegend) {
                 if (!updatedLegend)
@@ -107,26 +109,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     .style('height', '305px')
                     .call(_this.chart);
                 nv.utils.windowResize(function () {
-                    _this.onResize();
+                    _this.$timeout(function () {
+                        _this.onResize();
+                    }, 100);
                 });
                 _this.$rootScope.$on('pipMainResized', function () {
-                    _this.onResize();
+                    _this.$timeout(function () {
+                        _this.onResize();
+                    }, 1500);
                 });
                 _this.$rootScope.$on('pipAuxPanelOpened', function () {
                     _this.$timeout(function () {
                         _this.onResize();
-                    }, 1500);
+                    }, 100);
                 });
                 _this.$rootScope.$on('pipAuxPanelClosed', function () {
                     _this.$timeout(function () {
                         _this.onResize();
-                    }, 1500);
+                    }, 100);
                 });
                 return _this.chart;
             }, function () {
                 _this.$timeout(function () {
-                    _this.configBarWidthAndLabel();
-                }, 0);
+                    _this.configBarWidthAndLabel(0);
+                }, 1000);
                 _this.drawEmptyState();
             });
         };
@@ -169,24 +175,38 @@ Object.defineProperty(exports, "__esModule", { value: true });
                 g.attr('transform', 'translate(' + (50 + margin) + ', 0), ' + 'scale(' + ((width - 2 * margin) / 126) + ', 1)');
             }
         };
+        BarChartController.prototype.getGroupSize = function () {
+            var n = 1;
+            for (var i = 0; i < this.data.length; i++) {
+                if (this.data[i] && this.data[i].values && this.data[i].values.length > 0) {
+                    if (this.data[i].values.length > n) {
+                        n = this.data[i].values.length;
+                    }
+                }
+            }
+            return n;
+        };
         BarChartController.prototype.configBarWidthAndLabel = function (timeout) {
             var _this = this;
             if (timeout === void 0) { timeout = 1000; }
             var labels = this.$element.find('.nv-bar text'), chartBars = this.$element.find('.nv-bar'), parentHeight = this.$element.find('.nvd3-svg')[0].getBBox().height;
             d3.select(this.$element.find('.bar-chart')[0]).classed('visible', true);
+            var groupSize = this.getGroupSize();
+            var space = groupSize == 1 ? this.spaceAfterBar : this.spaceAfterMultiBar;
+            var correction = groupSize == 1 ? 0 : this.spaceAfterMultiBar;
             _.each(chartBars, function (item, index) {
-                var barHeight = Number(d3.select(item).select('rect').attr('height')), barWidth = Number(d3.select(item).select('rect').attr('width')), element = d3.select(item), x = d3.transform(element.attr('transform')).translate[0], y = d3.transform(element.attr('transform')).translate[1];
+                var barHeight = Number(d3.select(item).select('rect').attr('height')), barWidth = Number(d3.select(item).select('rect').attr('width')) / groupSize - correction, element = d3.select(item), x = d3.transform(element.attr('transform')).translate[0], y = d3.transform(element.attr('transform')).translate[1];
                 element
-                    .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + (_this.height - 20) + ')')
+                    .attr('transform', 'translate(' + Number(x + index * (barWidth + space)) + ', ' + (_this.height - 20) + ')')
                     .select('rect').attr('height', 0);
                 element
                     .transition()
                     .duration(timeout)
-                    .attr('transform', 'translate(' + Number(x + index * (barWidth + 15)) + ', ' + y + ')')
+                    .attr('transform', 'translate(' + Number(x + index * (barWidth + space)) + ', ' + y + ')')
                     .select('rect').attr('height', barHeight);
                 d3.select(labels[index])
                     .attr('dy', barHeight / 2 + 10)
-                    .attr('x', barWidth / 2);
+                    .attr('x', barWidth * groupSize / 2);
             });
         };
         BarChartController.prototype.generateParameterColor = function () {
