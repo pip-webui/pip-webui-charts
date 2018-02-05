@@ -109,30 +109,26 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     .style('height', '305px')
                     .call(_this.chart);
                 nv.utils.windowResize(function () {
-                    _this.$timeout(function () {
-                        _this.onResize();
-                    }, 100);
+                    _this.onResize();
                 });
                 _this.$rootScope.$on('pipMainResized', function () {
-                    _this.$timeout(function () {
-                        _this.onResize();
-                    }, 1500);
+                    _this.onResize();
                 });
                 _this.$rootScope.$on('pipAuxPanelOpened', function () {
                     _this.$timeout(function () {
                         _this.onResize();
-                    }, 100);
+                    }, 1000);
                 });
                 _this.$rootScope.$on('pipAuxPanelClosed', function () {
                     _this.$timeout(function () {
                         _this.onResize();
-                    }, 100);
+                    }, 1000);
                 });
                 return _this.chart;
             }, function () {
                 _this.$timeout(function () {
                     _this.configBarWidthAndLabel(0);
-                }, 1000);
+                }, 0);
                 _this.drawEmptyState();
             });
         };
@@ -184,7 +180,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     }
                 }
             }
-            return n;
+            return this.data.length;
         };
         BarChartController.prototype.configBarWidthAndLabel = function (timeout) {
             var _this = this;
@@ -193,21 +189,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
             d3.select(this.$element.find('.bar-chart')[0]).classed('visible', true);
             var groupSize = this.getGroupSize();
             var space = groupSize == 1 ? this.spaceAfterBar : this.spaceAfterMultiBar;
-            var correction = groupSize == 1 ? 0 : this.spaceAfterMultiBar;
-            _.each(chartBars, function (item, index) {
-                var barHeight = Number(d3.select(item).select('rect').attr('height')), barWidth = Number(d3.select(item).select('rect').attr('width')) / groupSize - correction, element = d3.select(item), x = d3.transform(element.attr('transform')).translate[0], y = d3.transform(element.attr('transform')).translate[1];
-                element
-                    .attr('transform', 'translate(' + Number(x + index * (barWidth + space)) + ', ' + (_this.height - 20) + ')')
-                    .select('rect').attr('height', 0);
-                element
-                    .transition()
-                    .duration(timeout)
-                    .attr('transform', 'translate(' + Number(x + index * (barWidth + space)) + ', ' + y + ')')
-                    .select('rect').attr('height', barHeight);
-                d3.select(labels[index])
-                    .attr('dy', barHeight / 2 + 10)
-                    .attr('x', barWidth * groupSize / 2);
-            });
+            var correction = 2;
+            if (groupSize > 1) {
+                _.each(chartBars, function (item, index) {
+                    var barHeight = Number(d3.select(item).select('rect').attr('height')), barWidth = Number(d3.select(item).select('rect').attr('width')) / groupSize, element = d3.select(item), x = d3.transform(element.attr('transform')).translate[0], y = d3.transform(element.attr('transform')).translate[1];
+                    element
+                        .attr('transform', 'translate(' + Number(x + index * (barWidth)) + ', ' + (_this.height - 20) + ')')
+                        .select('rect').attr('height', 0);
+                    element
+                        .transition()
+                        .duration(timeout)
+                        .attr('transform', 'translate(' + Number(x + index * (barWidth)) + ', ' + y + ')')
+                        .select('rect').attr('height', barHeight);
+                    d3.select(labels[index])
+                        .attr('dy', barHeight / 2 + 10)
+                        .attr('x', barWidth * groupSize / 2);
+                });
+            }
         };
         BarChartController.prototype.generateParameterColor = function () {
             var _this = this;
