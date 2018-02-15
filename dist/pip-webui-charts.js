@@ -74,8 +74,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
                     .margin({
                     top: 10,
                     right: 0,
-                    bottom: 10,
-                    left: 50
+                    bottom: 10
                 })
                     .x(function (d) {
                     return d.label || d.key || d.x;
