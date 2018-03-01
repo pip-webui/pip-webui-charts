@@ -1073,22 +1073,6 @@ try {
   module = angular.module('pipCharts.Templates', []);
 }
 module.run(['$templateCache', function($templateCache) {
-  $templateCache.put('bar_chart/BarChart.html',
-    '<div class="bar-chart">\n' +
-    '    <svg ></svg>\n' +
-    '</div>\n' +
-    '\n' +
-    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
-}]);
-})();
-
-(function(module) {
-try {
-  module = angular.module('pipCharts.Templates');
-} catch (e) {
-  module = angular.module('pipCharts.Templates', []);
-}
-module.run(['$templateCache', function($templateCache) {
   $templateCache.put('chart_legend/ChartInteractiveLegend.html',
     '<div >\n' +
     '    <div class="chart-legend-item" ng-repeat="item in $ctrl.series" ng-show="item.values || item.value">\n' +
@@ -1111,6 +1095,22 @@ module.run(['$templateCache', function($templateCache) {
     '        </div>\n' +
     '    </div>\n' +
     '</div>');
+}]);
+})();
+
+(function(module) {
+try {
+  module = angular.module('pipCharts.Templates');
+} catch (e) {
+  module = angular.module('pipCharts.Templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('bar_chart/BarChart.html',
+    '<div class="bar-chart">\n' +
+    '    <svg ></svg>\n' +
+    '</div>\n' +
+    '\n' +
+    '<pip-chart-legend ng-show="$ctrl.legend" pip-series="$ctrl.legend" pip-interactive="$ctrl.interactiveLegend"></pip-chart-legend>');
 }]);
 })();
 
